@@ -1,0 +1,209 @@
+﻿@using EdayRoom.API
+@using EdayRoom.Models
+@{
+    ViewBag.Title = "Detalle de Alerta";
+    ViewBag.AlertasMenuClass = "active";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Centro centroObj = (Centro) ViewData["centroObj"];
+}
+@* DIALOGO DE update de last data*@
+<script type="text/html" id="tpl-alerta-add-comentario">
+      <![CDATA[
+        <form id="form-update-alert" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Actualizar Alerta</span></div> 
+            <div class="data-loading-form"> 
+                <label>Mensaje:</label> 
+                <div class="data-loading-field mws-form-item "> 
+                    <textarea id="message-alert" name="message-alert" class="required" style="height: 5em;" rows="100%" cols="100%" ></textarea> 
+                </div>
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Enviar" class="mws-button green small"/> 
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/>
+                </div>
+            </div> 
+        </form>
+        ]]>
+</script>
+<div>
+    
+    <a href="@Url.Action("ListAlertas")">< Volver al listado </a>
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Detalles de Alerta</span>
+        </div>
+        <div class="mws-panel-body">
+            <div class="mws-form-message">
+                <table>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Centro:</b>
+                        </td>
+                        <td>
+                                    <a href="/Centros/Edit/@ViewData["idCentro"]">@ViewData["centro"]</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Codigo centro:</b>
+                        </td>
+                        <td>
+                                    @centroObj.unique_id
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Estado:</b>
+                        </td>
+                        <td>
+                                    @centroObj.unidadGeografica1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Municipio:</b>
+                        </td>
+                        <td>
+                                    @centroObj.unidadGeografica2
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Parroquia:</b>
+                        </td>
+                        <td>
+                                    @centroObj.unidadGeografica3
+                        </td>
+                    </tr>
+                    @if ((int)ViewData["idMesa"] != -1)
+                    {
+                        <tr>
+                            <td style="padding-right: 10px; text-align: right;">
+                                <b>Mesa:</b>
+                            </td>
+                            <td>
+                                <a href="/Mesas/Edit/@ViewData["idMesa"]">@ViewData["mesa"]</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Alerta:</b>
+                        </td>
+                        <td>
+                            @ViewData["alerta"]
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px; text-align: right;">
+                            <b>Fecha:</b>
+                        </td>
+                        <td>
+                            @(((DateTime)ViewData["fecha"]).ToString("yyyy/MM/dd @ HH:mm"))
+                        </td>
+                    </tr>
+                </table>
+                @if (((List<AlertaMessageWrapper>)ViewData["messages"]).Any())
+                {
+                    <h3>Mensajes</h3>
+                    <table class="mws-datatable mws-table">
+                        <thead>
+                            <th>Usuario</th>
+                            <th>Fecha</th>
+                            <th>Comentario</th>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in ((List<AlertaMessageWrapper>)ViewData["messages"]))
+                            {
+                                <tr>
+                                    <td>
+                                        @m.User
+                                    </td>
+                                    <td>
+                                        @m.FechaStr
+                                    </td>
+                                    <td>
+                                        @m.Message
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+            <div style="padding: 10px; text-align: right;">
+                <input type="button" value="Agregar Comentario" class="mws-button green small add-data" />
+                <input type="button" value="Cancelar Alerta" class="mws-button red small cancel-alert" />
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".add-data").click(function () {
+            var panelHtml = $("#tpl-alerta-add-comentario").jqote();
+            $('div#mws-container').block({
+                message: panelHtml,
+                css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                focusInput: true,
+                overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+            });
+            //ACTIVO LAS RESTRICCIONES AL CAMPO
+            $("#form-update-alert").validate({
+                invalidHandler: function () {
+                    if ($.fn.effect) {
+                        $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                    }
+                },
+                messages: {
+                    "message-alert": {
+                        required: "* Obligatorio"
+                    }
+                }
+            });
+            //BINDING de los action buttons
+            $('#add-data-action').click(function () {
+                if ($("#form-update-alert").valid()) {
+                    $('div#mws-container').unblock();
+
+                    $.ajax({
+                        contentType: 'application/json, charset=utf-8',
+                        type: "POST",
+                        url: "/Alertas/AddMessageToAlert",
+                        data: JSON.stringify({ idAlerta: @ViewData["idAlerta"], modulo: "@ViewData["modulo"]", message: $("#message-alert").val()}),
+                        cache: false,
+                        dataType: "json",
+                        success: function () {
+                            alert("mensaje enviado");
+
+                        },
+                        error: function (x, ts, et) {
+                            alert('error ' + x + "-" + ts + "-" + et);
+                        }
+                    });
+
+                    $.jGrowl($.format("Participacion reportada para centro \"{0}\".", contact.Centro), {
+                        header: "Participacion",
+                        animateOpen: {
+                            opacity: 'show'
+                        },
+                        animateClose: {
+                            opacity: 'hide'
+                        }
+                    });
+                }
+            });
+            $('#add-data-cancel').click(function () {
+                $('div#mws-container').unblock();
+            });
+        });
+        $(".cancel-alert").click(function () {
+            if(confirm("Está seguro de que desea cancelar esta alerta?")) {
+                var url = "@Url.Action("CancelAlert")";
+                url += "?idAlerta=@Html.Raw(ViewData["idAlerta"].ToString())";
+                url += "&modulo=@Html.Raw((string)ViewData["modulo"])";
+                window.location = url;
+            } 
+        });
+    });
+
+</script>

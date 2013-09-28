@@ -1,0 +1,140 @@
+﻿@using EdayRoom.Core
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Mesa m = (Mesa)ViewData["mesa"];
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#editTestigo").click(function () {
+            $("#testigoName, #testigoNumber").hide();
+            $("#testigoInputName, #testigoInputNumber").show();
+            $("#editLinks").show();
+        });
+
+        $("#testigoEditCancel").click(function () {
+            $("#testigoName, #testigoNumber").show();
+            $("#testigoInputName, #testigoInputNumber").hide();
+            $("#editLinks").hide();
+            $("#newTestigoName").val($.trim($("#testigoName").html()));
+            $("#newTestigoNumber").val($.trim($("#testigoNumber").html()));
+
+        });
+
+        $("#testigoEditAccept").click(function () {
+
+            if (confirm("Esta seguro de que desea efectuar estos cambios?")) {
+
+                $("#testigoName, #testigoNumber").show();
+                $("#testigoInputName, #testigoInputNumber").hide();
+                $("#editLinks").hide();
+
+                var object = {
+                    name: $("#newTestigoName").val(),
+                    number: $("#newTestigoNumber").val(),
+                    tid: $("#testigoId").val()
+                };
+                $.ajax({
+                    url: '@Url.Action("EditTestigoParticipacion", "Mesas")',
+                    data: object,
+                    type: 'POST',
+                    success: function (data) {
+                        alert(data);
+                        $("#testigoName").html($.trim($("#newTestigoName").val()));
+                        $("#testigoNumber").html($.trim($("#newTestigoNumber").val()));
+
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+<h2>Edicion de mesas</h2>
+Centro: <a href="/Centros/Edit/@m.IdCentro">@m.Centro.Nombre </a>
+<br />
+Estado: @m.Centro.Ubicacion.Adm1
+<br />
+Municipio: @m.Centro.Ubicacion.Adm2
+<br />
+Parroquia: @m.Centro.Ubicacion.Adm3
+<br />
+Mesa #: @m.Numero
+<br />
+<br />
+
+
+<h6>Contacto Participación/Totalización: <a href="javascript:void(0);" id="editTestigo">[editar]</a> </h6>
+<input type="hidden" id="testigoId" value="@m.Enlaces.First(t => t.Activo).Id"/>
+<table>
+
+    <tr>
+        <td>Nombre:
+        </td>
+        <td>
+            <span id="testigoName">@m.Enlaces.First(t => t.Activo).Nombre
+            </span><span id="testigoInputName" style="display: none">
+                <input type="text" id="newTestigoName" value="@m.Enlaces.First(t => t.Activo).Nombre"/>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Telefono:
+        </td>
+        <td>
+            <span id="testigoNumber">
+                @m.Enlaces.First(t => t.Activo).Telefono
+            </span>
+            <span id="testigoInputNumber" style="display: none">
+                <input type="text" id="newTestigoNumber" value="@m.Enlaces.First(t => t.Activo).Telefono"/>
+            </span>
+        </td>
+    </tr>
+    <tr id="editLinks" style="display: none;">
+        <td colspan="2">
+            <a href="javascript:void(0);" id="testigoEditAccept">[Aceptar] </a>
+            <a href="javascript:void(0);" id="testigoEditCancel">[Cancelar] </a>
+        </td>
+    </tr>
+</table>
+Alertas de Participacion:
+<br />
+<table class="mws-table">
+    <tr>
+        <th>Fecha</th>
+        <th>Alerta</th>
+        <th>Usuario</th>
+        <th></th>
+    </tr>
+    @foreach (var pa in m.Alertas.Where(a => a.Modulo == Modulo.Participacion).OrderByDescending(p => p.Fecha))
+    {
+        <tr>
+            <td>@pa.Fecha.ToString("hh:mm tt")</td>
+            <td>@pa.NombreAlerta</td>
+            <td>@pa.Usuario.NombreCompleto</td>
+            <td>
+                @if (pa.Activa)
+                {
+                    <a href="/Alertas/DetailAlerta?idAlerta=@(pa.Id)&modulo=Participación">[ver]</a>
+                }
+            </td>
+        </tr>
+    }
+</table>
+Alertas de Totalizacion:
+<br />
+<ul>
+    @foreach (var ta in m.Alertas.Where(a => a.Modulo == Modulo.Totalizacion).OrderByDescending(p => p.Fecha))
+    {
+        <li>@ta.Fecha.ToString("hh:mm tt") @ta.NombreAlerta @ta.Usuario
+            @if (ta.Activa)
+            {
+                <a href="/Alertas/DetailAlerta?idAlerta=@(ta.Id)&modulo=Totalización">[ver]</a>
+            }
+        </li>
+    }
+</ul>
+

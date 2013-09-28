@@ -1,0 +1,81 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Totalizacion";
+    ViewBag.TotalizacionMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.totalizacion.js";
+    ViewBag.JqoteTemplate = "_TotalizacionJqoteTemplates";
+    var users = (List<user>)ViewData["users"];
+}
+@section headContent
+{
+    <style type="text/css">
+        .cargaNormal {
+            
+        }
+        .cargaAlta {
+                background-color: #E1F1C0;
+                border-color: #B5D56D;
+                color: #62A426;            
+        }
+        .cargaBaja {
+                background-color: #FFCBCA;
+                border-color: #EB979B;
+                color: #9B4449;            
+        }
+        
+    </style>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $(".pauseControl").live("click", function () {
+                var userid = $(this).attr('uid');
+                $.ajax({
+                    url: "@Url.Action("TogglePauseUser")",
+                    data: { userId: userid },
+                    success: function(data) {
+                       location.reload();
+                    },
+                    error: function() {
+                        alert('Ocurrio un error. Contacte a un administrador');
+                    }
+                });
+                
+
+
+            });
+        });
+    </script>
+
+}
+<h2>Usuarios</h2>
+@foreach (var u in users)
+{
+    var mesas = u.AsignacionTotalizacions.Count();
+    
+    var cargasTotal = u.Totalizacions.Count();
+    var alertasCount = u.TotalizacionAlertas.Count();
+    string clase = "cargaNormal";
+    
+    <div class="timelineItem @clase" id="contacto-@(u.id)" style="width:200px; float:left; margin-right:15px;">
+        <div class="userInfo">
+            <b style="font-size: 15px;">@(u.nombre + " " + u.apellido)
+            </b>
+            <br>
+            <b>Mesas Asignadas</b>: @mesas <br />
+            <b>Mesas Totalizadas </b>: @cargasTotal <br />
+            <b>Porcentaje totalizado</b>: @(cargasTotal*100/(mesas==0?1:mesas))%<br />
+            <b>Alertas</b>:@alertasCount<br />
+            @if (!u.paused)
+            {
+                <input type="button" value="Pausar" uid="@u.id" class="pauseControl mws-button add-data red small" />
+            }
+            else
+            {
+                <input type="button" value="Reiniciar" uid="@u.id" class="pauseControl mws-button add-data green small" />
+            }
+        </div>
+    </div>
+    
+    
+    
+    
+}

@@ -1,0 +1,43 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "SetupWizard";
+    Layout = "~/Views/SetupWizard/_LayoutSetupWizard.cshtml";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.setup.js";
+    ViewBag.UsersStepClass = "current";
+    ViewBag.ConfigurationMenuClass = "active";
+
+    var userFiles = (List<UserFile>) ViewData["userFiles"];
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        setup.init({
+            url: '/SetupWizard/SetupUsers',
+            uploadCallback: function(data) {
+                var response = data.response;
+                $("#respuesta").html(response);
+                $.getJSON('/SetupWizard/GetAllUserFiles', function(files) {
+                    $("#filePanelSpinner").hide().spin("false");
+                    $("#userFileList").show().html($("#tpl-userFiles").jqote(files));
+                });
+            }
+        });
+        setup.getUserFiles();
+    });
+</script>
+
+<div style="overflow: auto;">
+    <div style="float: left; width: 50%;">
+        <div id="filelist">No runtime found.</div>
+        <a id="pickfiles" href="#"><input type="button" value="Elegir Archivo" class="mws-button green small"></a> 
+        <a id="uploadfiles" href="#"><input type="button" value="Subir" class="mws-button blue small"></a>
+    </div>
+    <div style="float: left; width: 50%;" id="filePanel">
+        <h5>Archivos cargados anteriormente</h5>
+        <div id="filePanelSpinner" style="display: none; height: 40px; margin: auto; width: 40px;"></div>
+        <ul id="userFileList" style="max-height: 100px; overflow: auto;">
+        </ul>
+    </div>
+</div>
+<div id="respuesta" class="mws-panel-body">
+</div>

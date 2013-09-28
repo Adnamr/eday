@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "SetupWizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.setup.js";
+    ViewBag.JqoteTemplate = "_SetupJqoteTemplates";
+
+}
+
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-sign-post">Configuración del sistema</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-wizard clearfix">
+            <ul>
+                <li class="@ViewBag.UsersStepClass"><a class="mws-ic-16 ic-user" id="step-register-users" href="@Url.Action("UsersStep")"
+                                                       title="Registrar Usuarios">Registrar Usuarios</a></li>
+                <li class="@ViewBag.CentrosStepClass"><a href="@Url.Action("CentrosStep")" class="mws-ic-16 ic-house" title="Centros de Votacion">Centros de votacion</a>
+                </li>
+                <li><a class="mws-ic-16 ic-magnifier" href="#" title="Next Steps">Testigos</a> </li>
+                <li><a class="mws-ic-16 ic-direction" href="#" title="Next Steps">Elecciones</a>
+                </li>
+            </ul>
+        </div>
+        <div id="container">
+            @RenderBody()
+        </div>
+    </div>
+</div>

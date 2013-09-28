@@ -1,0 +1,36 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var oTable;
+    $(document).ready(function () {
+
+        oTable = $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "bFilter": false,
+            "sAjaxSource": "/Testigos/GetTestigosParticipacion?id_centro=@(Request["sSearch"])"
+        });
+    });
+</script>
+<h1> Configuración de centros de votación</h1>
+
+<div class="mws-panel grid_8">
+    <div class="mws-panel-body">
+        <table id="centros-table" class="mws-datatable mws-table">
+            <thead>
+                <th>Cod</th>
+                <th>Centro</th>
+                <th>Ubicacion</th>
+                <!--th>Mesa</th>
+                    <th>Votantes</th>
+                    <th>Contacto</th>
+                    <th>Contacto Secundario</th-->
+            </thead>
+            <tbody>
+                        
+            </tbody>
+
+        </table>
+    </div>
+</div>

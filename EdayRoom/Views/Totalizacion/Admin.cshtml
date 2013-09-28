@@ -1,0 +1,245 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Quick Count Admin";
+    ViewBag.TotalizacionMenuClass = "active";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var oTable = null;
+    function loadMesa(idMesa) {
+        $("#panel-detalle-mesas-content").load("@Url.Action("AdminMesa")?idMesa=" + idMesa, function() {
+            $("#panel-detalle-mesas-spinner").spin(false);
+            $("#panel-detalle-mesas-spinner").hide();
+            $("#panel-detalle-mesas-content").show("fade");
+        });
+    }
+
+    function loadCentro(idCentro) {
+        $("#panel-mesas-content").load("@Url.Action("AdminCentro")?idCentro=" + idCentro, function() {
+            $("#panel-mesas-spinner").spin(false);
+            $("#panel-mesas-spinner").hide();
+            $("#panel-mesas-content").show("fade");
+        });
+    }
+      function updateGaugeChart(chart) {
+            $.getJSON('@Url.Action("GetTotalizedPercentage")', null, function(data) {
+                var point = chart.series[0].points[0];
+                point.update(data.pct);
+                $("#stats-centros").html(data.totalizaciones + "/" + data.centros);
+            });
+
+        }
+    $(document).ready(function() {
+       oTable =  $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "@Url.Action("GetCentros")",
+            "sPaginationType": "full_numbers"
+        });
+        $(".centro-link").live("click",function() {
+            $("#panel-mesas-content").hide();
+            var centroId = $(this).attr("centro-id");
+
+            $("#panel-centros").hide("fade", function() {
+                $("#panel-mesas").show();
+                $("#panel-mesas-spinner").show();
+                $("#panel-mesas-spinner").spin("huge");
+                loadCentro(centroId);
+            });
+        });
+
+        function updatePieChart(chart) {
+            $.getJSON('@Url.Action("GetChartData")', null, function(data) {
+
+                var seriesData = new Array();
+                for (var i = 0; i < data.length; i++) {
+                    seriesData.push([data[i].Nombre, data[i].Votos]);
+                }
+                chart.series[0].setData(seriesData, true);
+            });
+        }
+
+        function updateGaugeChart(chart) {
+            $.getJSON('@Url.Action("GetTotalizedPercentage")', null, function(data) {
+                var point = chart.series[0].points[0];
+                var value = data.pct;
+                point.update(data.pct);
+                $("#stats-centros").html(data.totalizaciones + "/" + data.mesas);
+            });
+
+        }
+
+        var chartCentro = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'mws-line-chart-general'
+                },
+                credits: {
+                    href: null,
+                    text: "Generado por EdayRoom"
+                },
+
+                title: {
+                    text: 'Totalización'
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage.toFixed(2) + ' % (' + this.point.y + ' votos)';
+                    }
+                },
+
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function() {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage.toFixed(2) + ' % ';
+                            }
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Porcentaje de votos',
+                    size: 100,
+                    center: [240, 70]
+                }],
+                marker: {
+                    lineWidth: 1
+                }
+            },
+            function(chart) {
+                updatePieChart(chart);
+                setInterval(function() {
+                    updatePieChart(chart);
+                }, 5000);
+            });
+        var gaugeChart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'mws-line-chart-gauge',
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false,
+                    backgroundColor: null
+                },
+                title: {
+                    text: '% de Mesas Totalizadas'
+                },
+                pane: {
+                    startAngle: -120,
+                    endAngle: 120
+                },
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    minorTickInterval: 'auto',
+                    minorTickWidth: 1,
+                    minorTickLength: 10,
+                    minorTickPosition: 'inside',
+                    minorTickColor: '#666',
+
+                    tickPixelInterval: 30,
+                    tickWidth: 2,
+                    tickPosition: 'inside',
+                    tickLength: 10,
+                    tickColor: '#666',
+                    labels: {
+                        step: 2,
+                        rotation: 'auto'
+                    },
+                    title: {
+                        text: '%'
+                    }
+                },
+                series: [{
+                    name: '% Centros totalizados',
+                    data: [0],
+                    tooltip: {
+                        valueSuffix: ' %'
+                    }
+                }]
+            },
+            function(chart) {
+                updateGaugeChart(chart);
+                setInterval(function() {
+                    updateGaugeChart(chart);
+                }, 180000);
+            });
+    });
+</script>
+<div id="panel-centros">
+    <div class="mws-panel grid_4 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+            <div id="mws-line-chart-general" style="height: 250px; width: 100%;">
+            </div>
+        </div>
+    </div>
+    <div class="mws-panel grid_4 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Avance de la totalización</span>
+        </div>
+        <div class="mws-panel-body">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="padding: 10px; width: 170px;">
+                        <a class="mws-report" href="#">
+                            <!-- Statistic Icon (edit to change icon) -->
+                            <span class="mws-report-icon mws-ic ic-building"></span>
+                            <!-- Statistic Content -->
+                            <span class="mws-report-content"><span class="mws-report-title">Centros Totalizados</span>
+                                <span id="stats-centros" class="mws-report-value" style="font-size: 18px;">loading...</span>
+                            </span></a>
+                    </td>
+                    <td>
+                        <div id="mws-line-chart-gauge" style="height: 230px; width: 100%;">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+            <table class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>Centro</th>
+                        <th>Estado</th>
+                        <th>Municipio</th>
+                        <th>Parroquia</th>
+                        <th>Votantes</th>
+                        <th>Participacion</th>
+                        <th>Totalizado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="panel-mesas" class="grid_8" style="display: none;">
+    <div id="panel-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-mesas-content">
+    </div>
+</div>
+<div id="panel-detalle-mesas" class="grid_8" style="display: none;">
+    <div id="panel-detalle-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-detalle-mesas-content">
+    </div>
+</div>

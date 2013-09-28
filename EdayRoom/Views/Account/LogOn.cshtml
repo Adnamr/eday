@@ -1,0 +1,74 @@
+﻿@model EdayRoom.Models.LogOnModel
+@{
+    ViewBag.Title = "Log On";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#mws-login-form form").validate({
+            errorPlacement: function(error, element) {
+            },
+            invalidHandler: function(form, validator) {
+                if ($.fn.effect) {
+                    $("#mws-login-wrapper").effect("shake", { distance: 6, times: 2 }, 35);
+                }
+            }
+        });
+    });
+</script>
+<div id="mws-login-bg">
+    <div id="mws-login-wrapper">
+        <div id="mws-login">
+            <h1>Iniciar Sesion</h1>
+            <div class="mws-login-lock">
+                <img src="@Url.Content("~/Content/icons/24/locked-2.png")" alt="" />
+            </div>
+            <div id="mws-login-form">
+                    
+                @Html.ValidationSummary(true, "", new {@class = "mws-form-message error"});
+                    
+                @using (Html.BeginForm("LogOn", "Account", FormMethod.Post, new {@class = "mws-form"}))
+                {
+                    <div class="mws-form-row">
+                        <div class="mws-form-item large">
+                            
+                            @Html.TextBoxFor(m => m.UserName,
+                       new
+                           {
+                               @class = "mws-login-username mws-textinput required",
+                               placeholder = "username"
+                           });
+
+                        </div>
+                    </div>
+                    <div class="mws-form-row">
+                        <div class="mws-form-item large">
+                            @Html.PasswordFor(m => m.Password, new
+                                             {
+                                                 @class = "mws-login-password mws-textinput required",
+                                                 placeholder = "password"
+                                             });
+                        </div>
+                    </div>
+                    <div class="mws-form-row mws-inset">
+                        <ul class="mws-form-list inline">
+                            <li>
+                                @Html.CheckBoxFor(m => m.RememberMe)
+                                <label>Recordarme</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mws-form-row">
+                        <input type="submit" value="Login" class="mws-button green mws-login-button" />
+                    </div>
+                }
+                
+                
+            </div>
+           
+        </div>
+
+                <a href="/descargas.html" target="_blank"> Descargas AQUI </a>
+
+    </div>
+</div>

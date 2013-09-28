@@ -1,0 +1,604 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EA0CC8DC-CC1A-4785-AAD0-54CF0EF22937}</ProjectGuid>
+    <ProjectTypeGuids>{E53F8FEA-EAE0-44A6-8774-FFD645390401};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EdayRoom</RootNamespace>
+    <AssemblyName>EdayRoom</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>false</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPPlus">
+      <HintPath>..\..\..\..\..\Desktop\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\AlertaMessageWrapper.cs" />
+    <Compile Include="API\AlertaWrapper.cs" />
+    <Compile Include="API\CentroDeVotacion.cs" />
+    <Compile Include="API\CandidatoCountChart.cs" />
+    <Compile Include="API\DataLoading\CandidatoValue.cs" />
+    <Compile Include="API\DataLoading\CandidatoValueIncoming.cs" />
+    <Compile Include="API\DataLoading\TotalizacionContact.cs" />
+    <Compile Include="API\DataLoading\ExitPollContact.cs" />
+    <Compile Include="API\DataLoading\ExitPollStats.cs" />
+    <Compile Include="API\DataLoading\MovilizacionStats.cs" />
+    <Compile Include="API\DataLoading\MovilizacionContact.cs" />
+    <Compile Include="API\DataLoading\ParticipacionContact.cs" />
+    <Compile Include="API\DataLoading\TotalizacionContactAlertMessage.cs" />
+    <Compile Include="API\DataTable\DataTableHelper.cs" />
+    <Compile Include="API\Debbuging.cs" />
+    <Compile Include="API\MatrizDeSustitucion.cs" />
+    <Compile Include="API\ProgressClass.cs" />
+    <Compile Include="API\EdayRoomUser.cs" />
+    <Compile Include="API\Settings\SettingsHandler.cs" />
+    <Compile Include="API\Utilities.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AlertasController.cs" />
+    <Compile Include="Controllers\CandidatosController.cs" />
+    <Compile Include="Controllers\CentrosController.cs" />
+    <Compile Include="Controllers\DiagnosticController.cs" />
+    <Compile Include="Controllers\ExcelController.cs" />
+    <Compile Include="Controllers\MesasController.cs" />
+    <Compile Include="Controllers\QuickCountController.cs" />
+    <Compile Include="Controllers\ExitPollsController.cs" />
+    <Compile Include="Controllers\MovilizacionController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ParticipacionController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
+    <Compile Include="Controllers\SetupWizardController.cs" />
+    <Compile Include="Controllers\TestigosController.cs" />
+    <Compile Include="Controllers\TotalizacionController.cs" />
+    <Compile Include="Controllers\UsuariosController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="API\DataLoading\ParticipacionStats.cs" />
+    <Content Include="Content\bootstrap-responsive.min.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\img\bg_blue.png" />
+    <Content Include="Content\img\bg_blue_small.png" />
+    <Content Include="Content\img\bg_green.png" />
+    <Content Include="Content\img\bg_green_small.png" />
+    <Content Include="Content\img\bg_orange.png" />
+    <Content Include="Content\img\bg_orange_small.png" />
+    <Content Include="Content\img\glyphicons-halflings-white.png" />
+    <Content Include="Content\img\glyphicons-halflings.png" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\d3.v3.min.js" />
+    <Content Include="Scripts\edayroom\wr.dashboard.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\colorpicker.css" />
+    <Content Include="Content\dashboard.css" />
+    <Content Include="Content\humanmsg.css" />
+    <Content Include="Content\core\button.css" />
+    <Content Include="Content\core\core.css" />
+    <Content Include="Content\core\error.css" />
+    <Content Include="Content\core\form.css" />
+    <Content Include="Content\core\gallery.css" />
+    <Content Include="Content\core\login.css" />
+    <Content Include="Content\core\misc.css" />
+    <Content Include="Content\core\panels.css" />
+    <Content Include="Content\core\plugins.css" />
+    <Content Include="Content\core\report.css" />
+    <Content Include="Content\core\responsive.css" />
+    <Content Include="Content\core\table.css" />
+    <Content Include="Content\core\themer.css" />
+    <Content Include="Content\demo.css" />
+    <Content Include="Content\fluid.css" />
+    <Content Include="Content\fonts\ptsans\stylesheet.css" />
+    <Content Include="Content\icons\16x16.css" />
+    <Content Include="Content\icons\24x24.css" />
+    <Content Include="Content\icons\32x32.css" />
+    <Content Include="Content\jquery.jgrowl.css" />
+    <Content Include="Content\jquery.tzineClock.css" />
+    <Content Include="Content\jui\jquery.multiselect.css" />
+    <Content Include="Content\jui\jquery.ui.css" />
+    <Content Include="Content\mws.style.css" />
+    <Content Include="Content\mws.theme.css" />
+    <Content Include="Content\reset.css" />
+    <Content Include="Content\jquery.toggle.skin\skin.css" />
+    <Content Include="Content\jquery.toggle.skin\toggle_handle-bg.png" />
+    <Content Include="Content\jquery.toggle.skin\toggle_handle_left-bg.png" />
+    <Content Include="Content\jquery.toggle.skin\toggle_handle_right-bg.png" />
+    <Content Include="Content\jquery.toggle.skin\toggle_shadow-bg.png" />
+    <Content Include="Content\text.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Content\themes\base\jquery.ui.all.css" />
+    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Content\themes\base\jquery.ui.base.css" />
+    <Content Include="Content\themes\base\jquery.ui.button.css" />
+    <Content Include="Content\themes\base\jquery.ui.core.css" />
+    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Content\edayroom.css" />
+    <Content Include="Global.asax" />
+    <Content Include="images\mws-logo.png" />
+    <Content Include="Scripts\blockUI.js" />
+    <Content Include="Scripts\jquery.dateFormat.js" />
+    <Content Include="Scripts\edayroom\wr.global.js" />
+    <Content Include="Scripts\edayroom\wr.testigos.js" />
+    <Content Include="Scripts\edayroom\wr.quickcount.js" />
+    <Content Include="Scripts\edayroom\wr.totalizacion.js" />
+    <Content Include="Scripts\highcharts\adapters\mootools-adapter.js" />
+    <Content Include="Scripts\highcharts\adapters\mootools-adapter.src.js" />
+    <Content Include="Scripts\highcharts\adapters\prototype-adapter.js" />
+    <Content Include="Scripts\highcharts\adapters\prototype-adapter.src.js" />
+    <Content Include="Scripts\highcharts\highcharts-more.js" />
+    <Content Include="Scripts\highcharts\highcharts.js" />
+    <Content Include="Scripts\highcharts\highcharts.src.js" />
+    <Content Include="Scripts\highcharts\modules\canvas-tools.js" />
+    <Content Include="Scripts\highcharts\modules\canvas-tools.src.js" />
+    <Content Include="Scripts\highcharts\modules\exporting.js" />
+    <Content Include="Scripts\highcharts\modules\exporting.src.js" />
+    <Content Include="Scripts\highcharts\themes\dark-blue.js" />
+    <Content Include="Scripts\highcharts\themes\dark-green.js" />
+    <Content Include="Scripts\highcharts\themes\gray.js" />
+    <Content Include="Scripts\highcharts\themes\grid.js" />
+    <Content Include="Scripts\highcharts\themes\skies.js" />
+    <Content Include="Scripts\jquery.jeditable.js" />
+    <Content Include="Scripts\jquery.multiselect.min.js" />
+    <Content Include="Scripts\mapas\JavaScript1.js" />
+    <Content Include="Scripts\plugins\colorpicker\colorpicker-min.js" />
+    <Content Include="Scripts\plugins\colorpicker\colorpicker.css" />
+    <Content Include="Scripts\plugins\colorpicker\colorpicker.js" />
+    <Content Include="Scripts\plugins\colorpicker\images\blank.gif" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_background.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_hex.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_hsb_b.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_hsb_h.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_hsb_s.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_indic.gif" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_overlay.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_rgb_b.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_rgb_g.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_rgb_r.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_select.gif" />
+    <Content Include="Scripts\plugins\colorpicker\images\colorpicker_submit.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_background.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_hex.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_hsb_b.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_hsb_h.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_hsb_s.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_indic.gif" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_rgb_b.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_rgb_g.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_rgb_r.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\custom_submit.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\select.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\select2.png" />
+    <Content Include="Scripts\plugins\colorpicker\images\slider.png" />
+    <Content Include="Scripts\validationMessages.js" />
+    <Content Include="Scripts\edayroom\wr.exitpolls.js" />
+    <Content Include="Scripts\edayroom\wr.usuarios.js" />
+    <Content Include="Scripts\edayroom\wr.movilizacion.js" />
+    <Content Include="Scripts\edayroom\wr.centros.js" />
+    <Content Include="Scripts\jquery.toggle.js" />
+    <Content Include="Scripts\edayroom\wr.setup.js" />
+    <Content Include="Scripts\global.js" />
+    <Content Include="Scripts\jqote.min.js" />
+    <Content Include="Scripts\jquery-1.7.1.min.js" />
+    <Content Include="Scripts\jquery-ui.js" />
+    <Content Include="Scripts\jquery.jgrowl.js" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_blue.png" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_blue_small.png" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_green.png" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_green_small.png" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_orange.png" />
+    <Content Include="Scripts\jquery.tzineClock\img\bg_orange_small.png" />
+    <Content Include="Scripts\jquery.tzineClock\jquery.tzineClock.js" />
+    <Content Include="Scripts\mws.js" />
+    <Content Include="Scripts\plugins\datatables\jquery.dataTables-min.js" />
+    <Content Include="Scripts\plugins\datatables\jquery.dataTables.js" />
+    <Content Include="Scripts\plugins\flot\excanvas.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.colorhelpers.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.crosshair.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.fillbetween.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.image.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.navigate.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.pie.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.resize.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.selection.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.stack.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.symbol.min.js" />
+    <Content Include="Scripts\plugins\flot\jquery.flot.threshold.min.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\cs.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\da.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\de.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\es.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\fi.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\fr.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\it.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\ja.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\lv.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\nl.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\pt-br.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\ru.js" />
+    <Content Include="Scripts\plugins\plupload\i18n\sv.js" />
+    <Content Include="Scripts\plugins\plupload\images\add.png" />
+    <Content Include="Scripts\plugins\plupload\images\delete.gif" />
+    <Content Include="Scripts\plugins\plupload\images\done.gif" />
+    <Content Include="Scripts\plugins\plupload\images\error.gif" />
+    <Content Include="Scripts\plugins\plupload\images\throbber.gif" />
+    <Content Include="Scripts\plugins\plupload\images\upload.png" />
+    <Content Include="Scripts\plugins\plupload\images\upload_disabled.png" />
+    <Content Include="Scripts\plugins\plupload\images\upload_icon.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue.css" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\css\jquery.plupload.queue.css" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\backgrounds.gif" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\buttons-disabled.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\buttons.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\delete.gif" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\done.gif" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\error.gif" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\throbber.gif" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\img\transp50.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.plupload.queue\jquery.plupload.queue.js" />
+    <Content Include="Scripts\plugins\plupload\jquery.ui.plupload\css\jquery.ui.plupload.css" />
+    <Content Include="Scripts\plugins\plupload\jquery.ui.plupload\img\plupload-bw.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.ui.plupload\img\plupload.png" />
+    <Content Include="Scripts\plugins\plupload\jquery.ui.plupload\jquery.ui.plupload.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.browserplus.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.flash.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.flash.swf" />
+    <Content Include="Scripts\plugins\plupload\plupload.full.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.gears.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.html4.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.html5.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.silverlight.js" />
+    <Content Include="Scripts\plugins\plupload\plupload.silverlight.xap" />
+    <Content Include="Scripts\plugins\validate\jquery.validate-min.js" />
+    <Content Include="Scripts\spin.min.js" />
+    <Content Include="Scripts\edayroom\wr.participacion.js" />
+    <Content Include="README.txt" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Account\ChangePasswordSuccess.cshtml" />
+    <Content Include="Views\Account\LogOn.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_LogOnPartial.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\Participacion.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Dashboard\Dashboard.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\_ParticipacionJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_LayoutLogin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\_MovilizacionJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\Movilizacion.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\AdminCentro.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\AdminMesa.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\UsersStep.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_LayoutClean.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\GetAllUsers.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\_LayoutSetupWizard.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\_SetupJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\CentrosStep.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\SetupWizard\GetAllCentros.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Alertas\Alertas.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Centros\Setup.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\AdminCentro.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\AdminMesa.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Candidatos\Candidatos.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Usuarios\SetupUsuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExitPolls\ExitPolls.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExitPolls\_ExitPollsJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Settings\Candidatos.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Settings\Settings.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\Totalizacion.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\GetMesas.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\_TotalizacionJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\QuickCount\QuickCount.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\QuickCount\_QuickCountJqoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExitPolls\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExitPolls\AdminCentro.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\QuickCount\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\QuickCount\AdminCentro.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\AdminCentro.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\AdminMesa.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mesas\Setup.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Testigos\Setup.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Diagnostic\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Participacion\Usuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Movilizacion\Usuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\QuickCount\Usuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Totalizacion\Usuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExitPolls\Usuarios.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_GlobalJQoteTemplates.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Alertas\ListAlertas.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Alertas\DetailAlerta.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mesas\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Centros\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Testigos\ListaTestigosParticipacion.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Carpetas\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\NavigationMenu.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Dashboard\Map.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\img\Thumbs.db" />
+    <None Include="Scripts\mapas\miranda.geojson" />
+    <Content Include="Scripts\mapas\miranda.json" />
+    <Content Include="Scripts\mapas\ve.json" />
+    <Content Include="Scripts\mapas\ve2.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EdayRoom.Core\EdayRoom.Core.csproj">
+      <Project>{b7f200e7-8a33-44c5-8732-8de071c4a48c}</Project>
+      <Name>EdayRoom.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EdayRoom.Data\EdayRoom.Models.csproj">
+      <Project>{2de7ff23-86be-4276-8aa5-e2d5900b3c30}</Project>
+      <Name>EdayRoom.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EdayRoom.Security\EdayRoom.Security.csproj">
+      <Project>{071553aa-1912-436d-a186-ec658b4c18a2}</Project>
+      <Name>EdayRoom.Security</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>3316</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

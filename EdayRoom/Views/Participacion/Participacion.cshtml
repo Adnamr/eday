@@ -1,0 +1,332 @@
+﻿@{
+    ViewBag.Title = "Participación";
+    ViewBag.ParticipacionMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.participacion.js";
+    ViewBag.JqoteTemplate = "_ParticipacionJqoteTemplates";
+}
+
+
+@section headContent
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            participacion.init();
+            //MENU DE CONTROL DE PARTICIPACION
+            $(".add-data").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = participacion.createContactObject(item);
+                var panelHtml = $("#tpl-add-data-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#form-valor-participacion").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    },
+                    rules: {
+                        valorparticipacion: {
+                            min: contact.LastValue,
+                            max: contact.Votantes
+                        },
+                        valorcola: {
+                            min: 0,
+                            max: contact.Votantes
+                        }
+                    },
+                    messages: {
+                        valorparticipacion: {
+                            digits: "* Solo numeros ",
+                            min: $.format("El valor debe ser mayor que {0}"),
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        },
+                        valorcola: {
+                            digits: "* Solo numeros ",
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        }
+                    }
+                });
+                $("#agregarAlerta").click(function () {
+                    if ($(this).attr('checked')) {
+                        $("#valor-alert,#message-alert").show();
+                    } else {
+                        $("#valor-alert,#message-alert").hide();
+                    }
+                });
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-participacion").valid()) {
+
+                        $('div#mws-container').unblock();
+
+                        participacion.updateParticipacion(item, contact, $("#valorparticipacion").val(), $("#valorcola").val(), function () {
+                            if ($("#agregarAlerta").attr("checked") && $("#valor-alert").val() != '') {
+                                participacion.alertaPartipacion(item, contact, $("#valor-alert").val(),
+                                    $("#message-alert").val());
+                            }
+                        });
+
+                        $.jGrowl($.format("Participacion reportada para centro \"{0}\".", contact.Centro), {
+                            header: "Participacion",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //MENU DE CONTROL DE ALERTAS
+            $(".add-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = participacion.createContactObject(item);
+                var panelHtml = $("#tpl-add-alert-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+
+                $("#alert-select-pane").spin("small");
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#alert-select-pane").spin(false);
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+
+                $("#form-valor-alerta").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#valor-alert").rules("add", {
+                    messages: {
+                        required: "Seleccione el tipo de alerta"
+                    }
+                });
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-alerta").valid()) {
+                        $('div#mws-container').unblock();
+
+                        participacion.alertaPartipacion(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                        //$("#timeline-alertas").append($("#tpl-timeline-alertas").jqote(contact));
+
+                        $.jGrowl($.format("Alerta reportada en centro \"{0}\".", contact.Centro), {
+                            header: "Alertas "
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //CIERRE DE MESA
+            $(".close-mesa").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = participacion.createContactObject(item);
+                var panelHtml = $("#tpl-close-mesa-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+
+              
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#cerrar-confirm").val() == "CERRAR") {
+                        
+                        $('div#mws-container').unblock();
+                        $.jGrowl($.format("Mesa cerrada en centro \"{0}\".", contact.Centro), {
+                            header: "Mesa Cerrada "
+                        });
+                        
+                        //participacion.alertaPartipacion(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                        //$("#timeline-alertas").append($("#tpl-timeline-alertas").jqote(contact));
+                        participacion.cerrarMesa(contact, function () {
+                          
+                            alert("inicia el cierre");  
+                            $(document).trigger('refreshContacts');
+                            $(document).trigger('refreshStatsEvent');
+                            alert("mesa cerrada");
+                        })
+                        
+                    } else {
+                        alert("para cerrar la mesa debe escribir 'CERRAR' en el espacio provisto");
+
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //UPDATE ALERT DIALOG
+            $(".update-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = participacion.createContactObject(item);
+
+                var panelHtml = $("#tpl-update-alert-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#mensajes-alerta").append($("#tpl-alert-messages").jqote(contact.BlockingAlert.Messages));
+
+                $("#form-update-alert").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#message-alert").rules("add", {
+                    messages: {
+                        required: "Debe agregar un comentario"
+                    }
+                });
+                //    //BINDING de los action buttons
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-alert").valid()) {
+                        $('div#mws-container').unblock();
+                        participacion.updateAlertaPartipacion(item, contact, $("#message-alert").val());
+                        $.jGrowl("Alerta Actualizada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#cancel-alert-action').click(function () {
+                    if (confirm("Esta seguro de que desea cancelar esta alerta?")) {
+                        $('div#mws-container').unblock();
+                        participacion.cancelAlertaParticipacion(item, contact);
+                        $.jGrowl("Alerta Cancelada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                }
+                );
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //Correccion de datos
+            $(".edit-last-value").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = participacion.createContactObject(item);
+                var panelHtml = $("#tpl-update-last-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#form-update-last-data").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    },
+                    rules: {
+                        lastvalue: {
+                            min: contact.PreviousValue,
+                            max: contact.Votantes
+                        },
+                        lastcola: {
+                            min: 0,
+                            max: contact.Votantes
+                        }
+                    },
+                    messages: {
+                        lastvalue: {
+                            digits: "* Solo numeros ",
+                            min: $.format("El valor debe ser mayor que {0}"),
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        },
+                        lastcola: {
+                            digits: "* Solo numeros ",
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        }
+                    }
+                });
+
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-last-data").valid()) {
+                        $('div#mws-container').unblock();
+
+                        participacion.updateLastParticipacion(item, contact, $("#lastvalue").val(), $("#lastcola").val());
+
+                        $.jGrowl($.format("Participacion reportada para centro \"{0}\".", contact.Centro), {
+                            header: "Participacion",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+        });
+    </script>
+}
+<div class="mws-report-container clearfix">
+    
+</div>
+<div class="mws-panel grid_5">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-phone">Proximas llamadas
+            </span>
+    </div>
+    <div id="timeline-pendiente" class="timeline">
+    </div>
+</div>
+<div class="mws-panel grid_3">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alarm-bell">Errores y alertas</span>
+    </div>
+    <div id="timeline-alertas" class="timeline">
+    </div>
+</div>

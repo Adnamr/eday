@@ -1,0 +1,234 @@
+﻿@using EdayRoom.Models
+@{
+    Layout = null;
+    var centro = (Centro) ViewData["centro"];
+    var candidatos = (List<Candidato>) ViewData["candidatos"];
+    var timelines = (List<ExitPollTimeline>) ViewData["timelines"];
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            .editInput { width: 50px; }
+        </style>
+        <title>AdminCentro</title>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/edayroom/wr.exitpolls.js")"> </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+            function isNumeric(value) {
+                return value != null && value.toString().match( /^[-]?\d*\.?\d*$/ );
+            }
+
+            $(document).ready(function() {
+                $("#mesas-volver").click(function() {
+                    $("#panel-mesas").hide("fade", function() {
+                        $("#panel-mesas-content").html('');
+                        $("#panel-centros").show("fade");
+
+                    });
+
+                });
+
+                $(".mesa-link").click(function() {
+                    $("#panel-detalle-mesas-content").hide();
+                    var idMesa = $(this).attr("mesa-id");
+
+                    $("#panel-mesas").hide("fade", function() {
+                        $("#panel-detalle-mesas").show();
+                        $("#panel-detalle-mesas-spinner").show();
+                        $("#panel-detalle-mesas-spinner").spin("huge");
+                        loadMesa(idMesa);
+                    });
+
+                });
+                var chartCentro;
+                // define the options
+                var options = {
+                    chart: {
+                        zoomType: 'x',
+                        renderTo: 'mws-line-chart'
+                    },
+                    title: {
+                        text: 'Exit Polls "@centro.Nombre"'
+                    },
+                    credits: {
+                        href: null,
+                        text: "Generado por EdayRoom"
+                    },
+
+                    xAxis: {
+                        type: 'datetime',
+                        tickWidth: 0,
+                        gridLineWidth: 1,
+                        labels: {
+                            align: 'left',
+                            x: 3,
+                            y: -3
+                        }
+                    },
+                    yAxis: [{
+// left y axis
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                            align: 'left',
+                            x: 3,
+                            y: 16,
+                            formatter: function() {
+                                return Highcharts.numberFormat(this.value, 0);
+                            }
+                        },
+                        showFirstLabel: false
+                    }, {
+// right y axis
+                        linkedTo: 0,
+                        gridLineWidth: 0,
+                        opposite: true,
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                            align: 'right',
+                            x: -3,
+                            y: 16,
+                            formatter: function() {
+                                return Highcharts.numberFormat(this.value, 0);
+                            }
+                        },
+                        showFirstLabel: false
+                    }],
+                    tooltip: {
+                        shared: true,
+                        crosshairs: true
+                    },
+                    plotOptions: {
+                        series: {
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function() {
+                                        hs.htmlExpand(null, {
+                                            pageOrigin: {
+                                                x: this.pageX,
+                                                y: this.pageY
+                                            },
+                                            headingText: this.series.name,
+                                            maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' +
+                                            this.y + ' visits',
+                                            width: 200
+                                        });
+                                    }
+                                }
+                            },
+                            marker: {
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: []
+                };
+
+                $.getJSON('@Url.Action("GetChartData", new {idCentro = centro.id})', null, function(data) {
+                    for (var i = 0; i < data.candidatos.length; i++) {
+                        var candidatoData = new Array();
+
+                        for (var j = 0; j < data.candidatos[i].Porcentajes.length; j++) {
+                            candidatoData.push(
+                                [Date.UTC(data.candidatos[i].Porcentajes[j].year, data.candidatos[i].Porcentajes[j].month, data.candidatos[i].Porcentajes[j].day, data.candidatos[i].Porcentajes[j].hour, data.candidatos[i].Porcentajes[j].min), data.candidatos[i].Porcentajes[j].value
+                                ]);
+
+                        }
+                        options.series.push({
+                            name: data.candidatos[i].Nombre,
+                            data: candidatoData
+                        });
+                    }
+
+                    chartCentro = new Highcharts.Chart(options);
+                });
+
+                $(".editExitpoll").click(function() {
+                    var id = $(this).attr('exitpoll-id');
+                    $(".value-" + id + ", .input-" + id).toggle();
+                    $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+                });
+
+                $(".acceptEdit").click(function() {
+                    var id = $(this).attr('exitpoll-id');
+                    $(".value-" + id + ", .input-" + id).toggle();
+                    $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+
+                    exitpolls.updateSingleExitPoll(id,
+                        function() {
+
+                            loadCentro(@centro.id);
+                        });
+                });
+
+            });
+        </script>
+        <div>
+            <a href="#centros" id="mesas-volver">volver</a>
+        </div>
+        <br />
+        <div class="mws-panel grid_8">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-table-1">Exit Poll "@centro.Nombre" </span>
+            </div>
+            <div class="mws-panel-body">
+                <table id="tabla-mesas" class="mws-datatable mws-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            @foreach (Candidato c in candidatos)
+                            {
+                                <th>@c.nombre</th>
+                            }
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ExitPollTimeline t in timelines)
+                        {
+                            <tr>
+                                <td>
+                                    @t.fecha.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                @foreach (Candidato c in candidatos)
+                                {
+                                    <td>
+                                        <span class="value-@t.id">
+                                            @t.ExitPolls.Single(ep => ep.id_candidato == c.id).valor
+                                        </span>
+                                        <input style="display: none" candidato-id="@c.id" class="input-@t.id editInput"  id="value-@t.id-@c.id" value="@t.ExitPolls.Single(ep => ep.id_candidato == c.id).valor"/>
+                                    </td>
+                                }
+                                <td>
+                                    <div id="lnkEdit-@t.id" exitpoll-id="@t.id"  class="mws-ic-16 ic-edit editExitpoll tableIcon16 clickable" alerta-id="1" style="float: left;">
+                                    </div>
+                                    <button id="btnEdit-@t.id" class="acceptEdit" style="display: none" exitpoll-id="@t.id">
+                                        OK</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <script type="text/javascript"> </script>
+            </div>
+        </div>
+        <div class="mws-panel grid_8 mws-collapsible">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-table-1">Tendencia del centro</span>
+            </div>
+            <div class="mws-panel-body">
+                <div class="mws-panel-content">
+                    <div id="mws-line-chart" style="height: 250px; width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

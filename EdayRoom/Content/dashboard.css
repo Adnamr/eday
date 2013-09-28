@@ -1,0 +1,70 @@
+﻿.tag1Selection, .tag2Selection  {
+    list-style-type: none;
+    font-size: 100%
+}
+.tag1Selection li,.tag2Selection li
+{
+    width: 32%;
+    margin: 0px;
+    padding: 0px 0px 4px 0px;
+    text-align: center;
+    color: grey;
+    font-size: 15px;
+    margin: 4px .5% 0 0;
+    border-bottom: 4px grey solid;
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    line-height:normal;
+    font: 16px/2em Arial,sans-serif;
+}
+.tag1Selection li.active 
+{
+    padding: 0px;
+}
+.todos.active {
+    color: green;
+    border-bottom: 8px green solid;
+}
+.oposicion.active {
+    color: blue;
+    border-bottom: 8px blue solid;
+}
+.chavista.active {
+    color: red;
+    border-bottom: 8px red solid;
+}
+
+.tag2Selection li {
+    width: 24%;
+    font: 14px/2em Arial,sans-serif;
+}
+.tag2Selection li.active 
+{
+    padding: 0px;
+    border-bottom:8px solid #2B8ABE
+
+}
+
+.dashboard-title
+{
+    font: 75% 'Lucida Sans Unicode','Lucida Grande',arial,helvetica,sans-serif;
+    color: #2B8ABE;
+font-size: 48px;
+font-weight: 300;
+font-family: 'Open Sans Condensed', Verdana, sans-serif;
+}
+.dashboard-title span
+{
+    font-weight: 700
+}
+#generalPanels {
+    overflow: auto;
+    margin: 1em 0;
+}
+.separator {
+    height: 1px;
+background: #B3BBC5;
+}
+
+

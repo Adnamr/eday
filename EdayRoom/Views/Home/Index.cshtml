@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Participación";
+    ViewBag.ParticipacionMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.participacion.js";
+}
+<!-- Statistics Button Container -->
+<div class="mws-report-container clearfix">
+    
+    <a class="mws-report" href="#">
+        <!-- Statistic Icon (edit to change icon) -->
+        <span class="mws-report-icon mws-ic ic-building"></span>
+        <!-- Statistic Content -->
+        <span class="mws-report-content">
+            <span class="mws-report-title">Centros de Votación</span>
+            <span class="mws-report-value">@ViewData["centrosVotacion"]</span> 
+        </span>
+    </a>
+    
+    <a class="mws-report" href="#">
+        <span class="mws-report-icon mws-ic ic-chair"></span>
+        <span class="mws-report-content">
+            <span class="mws-report-title">Mesas en elección</span> 
+            <span class="mws-report-value">@ViewData["mesas"]</span> 
+        </span>
+    </a>
+    
+    <a class="mws-report" href="#">
+        <span class="mws-report-icon mws-ic ic-walk"></span>
+        <span class="mws-report-content">
+            <span class="mws-report-title">Participación</span>
+            <span class="mws-report-value ">@ViewData["participacion"]</span> 
+        </span>
+    </a>
+    <a class="mws-report" href="#">
+        <span class="mws-report-icon mws-ic ic-small-car"></span>
+        <span class="mws-report-content">
+            <span class="mws-report-title">Movilización</span>
+            <span class="mws-report-value">@ViewData["movilizacion"]</span> 
+        </span>
+    </a>
+</div>
+
+<div class="mws-panel grid_3">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-phone">Llamadas pendientes</span>
+    </div>
+    <div class="timelineItem">
+        <div class="userPic">
+        </div>
+        <div class="userInfo">
+            Luiz Gonzalez<br />
+            <b>Ultima llamada</b>: 10/10/2012 10:13 am<br />
+            <b>Numero </b>: 0414 123 45 98<br />
+            <input type="button" value="Agregar Datos" class="mws-button add-data green small">
+            <input type="button" value="Snooze" class="mws-button snooze-button blue small">
+            <input type="button" value="Alerta" class="mws-button add-alert red small">
+        </div>
+    </div>
+    <div class="timelineItem">
+        <div class="userPic">
+        </div>
+        <div class="userInfo">
+            Luiz Gonzalez<br />
+            <b>Ultima llamada</b>: 10/10/2012 10:13 am<br />
+            <b>Numero </b>: 0414 123 45 98<br />
+            <input type="button" value="Agregar Datos" class="mws-button add-data green small">
+            <input type="button" value="Snooze" class="mws-button snooze-button blue small">
+            <input type="button" value="Alerta" class="mws-button add-alert red small">
+        </div>
+    </div>
+    <div class="timelineItem">
+        <div class="userPic">
+        </div>
+        <div class="userInfo">
+            Luiz Gonzalez<br />
+            <b>Ultima llamada</b>: 10/10/2012 10:13 am<br />
+            <b>Numero </b>: 0414 123 45 98<br />
+            <input type="button" value="Agregar Datos" class="mws-button add-data green small">
+            <input type="button" value="Snooze" class="mws-button snooze-button blue small">
+            <input type="button" value="Alerta" class="mws-button add-alert red small">
+        </div>
+    </div>
+</div>
+<div class="mws-panel grid_3">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-clock">Proximas llamadas</span>
+    </div>
+    <div class="timelineItem">
+        <div class="userPic">
+        </div>
+        <div class="userInfo">
+            Daniela Martinez<br />
+            <b>Proxima llamada</b>: 10/10/2012 2:33 pm<br />
+            <input type="button" value="Actualizar ahora" class="mws-button add-data green small">
+            <input type="button" value="Alerta" class="mws-button add-alert red small">
+            <span class="timer">1h 33m 21s </span>
+        </div>
+    </div>
+</div>
+<div class="mws-panel grid_2">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alarm-bell">Errores y alertas</span>
+    </div>
+    <div class="timelineItem">
+        <div class="userPic">
+        </div>
+        <div class="userInfo">
+        </div>
+    </div>
+</div>

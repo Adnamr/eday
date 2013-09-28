@@ -1,0 +1,172 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Participación Admin";
+    ViewBag.ExitPollsMenuClass = "active";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var oTable = null;
+    function loadCentro(idCentro) {
+        $("#panel-mesas-content").load("@Url.Action("AdminCentro")?idCentro=" + idCentro, function() {
+            $("#panel-mesas-spinner").spin(false);
+            $("#panel-mesas-spinner").hide();
+            $("#panel-mesas-content").show("fade");
+        });
+    }
+
+    $(document).ready(function() {
+       oTable = $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "@Url.Action("GetCentros")",
+            "sPaginationType": "full_numbers"
+        });
+        $(".centro-link").live("click", function() {
+            $("#panel-mesas-content").hide();
+            var centroId = $(this).attr("centro-id");
+
+            $("#panel-centros").hide("fade", function() {
+                $("#panel-mesas").show();
+                $("#panel-mesas-spinner").show();
+                $("#panel-mesas-spinner").spin("huge");
+                loadCentro(centroId);
+            });
+        });
+        var chartCentro;
+        // define the options
+        var options = {
+            chart: {
+                zoomType: 'x',
+                type: 'column',
+                renderTo: 'mws-line-chart-general'
+            },
+            credits: {
+                href: null,
+                text: "Generado por EdayRoom"
+            },
+
+            title: {
+                text: 'Participacion vs Cola'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickWidth: 0,
+                gridLineWidth: 1,
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: -3
+                }
+            },
+            yAxis: [{
+// left y axis
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }, {
+// right y axis
+                linkedTo: 0,
+                gridLineWidth: 0,
+                opposite: true,
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'right',
+                    x: -3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }],
+            tooltip: {
+                shared: true,
+                crosshairs: true
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'percent',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    }
+                }
+            },
+            series: []
+        };
+        $.getJSON('@Url.Action("GetChartData")', null, function(data) {
+
+            for (var i = 0; i < data.candidatos.length; i++) {
+                var candidatoData = new Array();
+
+                for (var j = 0; j < data.candidatos[i].Porcentajes.length; j++) {
+                    candidatoData.push(
+                        [Date.UTC(data.candidatos[i].Porcentajes[j].year, data.candidatos[i].Porcentajes[j].month, data.candidatos[i].Porcentajes[j].day, data.candidatos[i].Porcentajes[j].hour, data.candidatos[i].Porcentajes[j].min), data.candidatos[i].Porcentajes[j].value
+                        ]);
+
+                }
+                options.series.push({
+                    name: data.candidatos[i].Nombre,
+                    data: candidatoData
+                });
+            }
+
+            chartCentro = new Highcharts.Chart(options);
+        });
+    });
+</script>
+<div id="panel-centros">
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+            <div id="mws-line-chart-general" style="height: 250px; width: 100%;">
+            </div>
+        </div>
+    </div>
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+            <table class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>Centro</th>
+                        <th>Estado</th>
+                        <th>Municipio</th>
+                        <th>Parroquia</th>
+                        <th>Votantes</th>
+                        <th>Participacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                 </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="panel-mesas" class="grid_8" style="display: none;">
+    <div id="panel-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-mesas-content">
+    </div>
+</div>
+<div id="panel-detalle-mesas" class="grid_8" style="display: none;">
+    <div id="panel-detalle-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-detalle-mesas-content">
+    </div>
+</div>

@@ -1,0 +1,171 @@
+﻿@using EdayRoom.API.Settings
+@{
+    var settings = new SettingsHandler();
+    var db = new EdayRoom.Models.edayRoomEntities();
+    var user = db.users.Single(u => u.username == User.Identity.Name);
+}
+ 
+
+<ul>
+                    @if (settings.EnableDashboard && (Roles.IsUserInRole(User.Identity.Name, "dashboard")))
+                    {
+                        <li class="@ViewBag.DashboardMenuClass"><a href="@Url.Action("Index", "Dashboard")" class="mws-i-24 i-bar-graph">
+                            Dashboard</a></li>
+                    }
+                    @if (settings.EnableParticipacion && Roles.IsUserInRole(User.Identity.Name, "participacion"))
+                    {
+                        <li class="@ViewBag.ParticipacionMenuClass"><a href="@Url.Action("Index", "Participacion")" class="mws-i-24 i-walking-man">
+                                                                        Participaci&oacute;n</a>
+                            @if (Roles.IsUserInRole(User.Identity.Name, "supervisor") && !Roles.IsUserInRole(User.Identity.Name, "admin") )
+                            {
+                                <ul>                                
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "participacion" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                            @if (Roles.IsUserInRole(User.Identity.Name, "participacion-lider")
+                                )
+                            {
+                                <ul class="@(ViewBag.ParticipacionMenuClass == "active" ? "" : "closed")">
+                                    <li><a href="@Url.Action("Index", "Participacion")">Carga de datos</a> </li>
+                                    <li><a href="@Url.Action("Admin", "Participacion")">Administración</a> </li>
+                                    <li><a href="@Url.Action("Usuarios", "Participacion")">Usuarios</a> </li>
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "participacion" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                        </li>
+                    }
+                    @if (settings.EnableMovilizacion && Roles.IsUserInRole(User.Identity.Name, "movilizacion"))
+                    {
+                        <li class="@ViewBag.MovilizacionMenuClass"><a href="@Url.Action("Index", "Movilizacion")" class="mws-i-24 i-car">
+                                                                       Movilizaci&oacute;n</a>
+                                                                       @if (Roles.IsUserInRole(User.Identity.Name, "supervisor") && !Roles.IsUserInRole(User.Identity.Name, "admin"))
+                            {
+                                <ul>                                
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "movilizacion" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                            @if (Roles.IsUserInRole(User.Identity.Name, "movilizacion-lider"))
+                            {
+                                <ul class="@(ViewBag.MovilizacionMenuClass == "active" ? "" : "closed")">
+                                    <li><a href="@Url.Action("Index", "Movilizacion")">Carga de datos</a> </li>
+                                    <li><a href="@Url.Action("Admin", "Movilizacion")">Administración</a> </li>
+                                    <li><a href="@Url.Action("Usuarios", "Movilizacion")">Usuarios</a> </li>
+                                                                    <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "movilizacion" })">
+                                Alertas</a> </li>
+
+                                </ul>
+                            }
+                        </li>
+                    }
+                    @if (settings.EnableExitPolls && Roles.IsUserInRole(User.Identity.Name, "exitpolls"))
+                    {
+                        <li class="@ViewBag.ExitPollsMenuClass"><a href="@Url.Action("Index", "ExitPolls")" class="mws-i-24 i-exit">
+                                                                    Exit Polls</a>
+                                                                    @if (Roles.IsUserInRole(User.Identity.Name, "supervisor") && !Roles.IsUserInRole(User.Identity.Name, "admin"))
+                            {
+                                <ul>                                
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "exitpoll" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                            @if (Roles.IsUserInRole(User.Identity.Name, "exitpolls-lider"))
+                            {
+                                <ul class="@(ViewBag.ExitPollsMenuClass == "active" ? "" : "closed")">
+                                    <li><a href="@Url.Action("Index", "ExitPolls")">Carga de datos</a> </li>
+                                    <li><a href="@Url.Action("Admin", "ExitPolls")">Administración</a> </li>
+                                    <li><a href="@Url.Action("Usuarios", "ExitPolls")">Usuarios</a> </li>
+                                                                    <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "exitpoll" })">
+                                Alertas</a> </li>
+
+                                </ul>
+                            }
+                        </li>
+                    }
+                    @if (settings.EnableQuickCount && Roles.IsUserInRole(User.Identity.Name, "quickcount"))
+                    {
+                        <li class="@ViewBag.QuickCountMenuClass"><a href="@Url.Action("Index", "QuickCount")" class="mws-i-24 i-calculator">
+                                                                     Conteo R&aacute;pido</a>
+                                                                     @if (Roles.IsUserInRole(User.Identity.Name, "supervisor") && !Roles.IsUserInRole(User.Identity.Name, "admin"))
+                            {
+                                <ul>                                
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "quickcount" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                            @if (Roles.IsUserInRole(User.Identity.Name, "quickcount-lider"))
+                            {
+                                <ul class="@(ViewBag.QuickCountMenuClass == "active" ? "" : "closed")">
+                                    <li><a href="@Url.Action("Index", "QuickCount")">Carga de datos</a> </li>
+                                    <li><a href="@Url.Action("Admin", "QuickCount")">Administración</a> </li>
+                                    <li><a href="@Url.Action("Usuarios", "QuickCount")">Usuarios</a> </li>
+                                                                    <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "quickcount" })">
+                                Alertas</a> </li>
+
+                                </ul>
+                            }
+                        </li>
+                    }
+                    @if (settings.EnableTotalizacion && Roles.IsUserInRole(User.Identity.Name, "totalizacion"))
+                    {
+                        <li class="@ViewBag.TotalizacionMenuClass">
+                            <a href="@Url.Action("Index", "Totalizacion")" class="mws-i-24 i-table-1">
+                                Totalizaci&oacute;n</a>
+                                @if (Roles.IsUserInRole(User.Identity.Name, "supervisor") && !Roles.IsUserInRole(User.Identity.Name, "admin"))
+                            {
+                                <ul>                                
+                                <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "totalizacion" })">
+                                Alertas</a> </li>
+                                </ul>
+                            }
+                            @if (Roles.IsUserInRole(User.Identity.Name, "totalizacion-lider")
+                                )
+                            {
+                                <ul class="@(ViewBag.TotalizacionMenuClass == "active" ? "" : "closed")">
+                                    <li><a href="@Url.Action("Index", "Totalizacion")">Carga de datos</a> </li>
+                                    <li><a href="@Url.Action("Admin", "Totalizacion")">Administración</a> </li>
+                                    <li><a href="@Url.Action("Usuarios", "Totalizacion")">Usuarios</a> </li>
+                                                                    <li><a href="@Url.Action("ListAlertas", "Alertas", new { modulo = "totalizacion" })">
+                                Alertas</a> </li>
+
+                                </ul>
+                            }
+                        </li>
+                    }
+                    
+                    @if (Roles.IsUserInRole(User.Identity.Name, "alertas"))
+                    {
+                        <li class="@ViewBag.AlertasMenuClass">
+                            <a href="@Url.Action("ListAlertas", "Alertas")" class="mws-i-24 i-alert-2">
+                                      Alertas</a>
+                        </li>
+                    }
+                    @if (Roles.IsUserInRole(User.Identity.Name, "admin"))
+                    {
+                        <li class="@ViewBag.ConfigurationMenuClass"><a href="#" class="mws-i-24 i-cog">Configuraci&oacute;n
+                        </a>
+                            <ul class="@(ViewBag.ConfigurationMenuClass == "active" ? "" : "closed")">
+                                <li><a class="@ViewBag.SettingsCentroMenuClass" href="@Url.Action("Index", "Centros")">
+                                    Centros de votaci&oacute;n</a> </li>
+                                <li><a class="@ViewBag.SettingsDashboardMenuClass" href="@Url.Action("Config", "Dashboard")">
+                                    Dashboard</a> </li>
+                                <li><a class="@ViewBag.SettingsMesasMenuClass" href="@Url.Action("Index", "Mesas")">
+                                    Mesas </a></li>
+                                <li><a class="@ViewBag.SettingsTestigosMenuClass" href="@Url.Action("Index", "Testigos")">
+                                    Testigos </a></li>
+                                <li><a class="@ViewBag.SettingsAlertaMenuClass" href="@Url.Action("Index", "Alertas")">
+                                    Alertas</a> </li>
+                                <li><a class="@ViewBag.SettingsCandidatoMenuClass" href="@Url.Action("Index", "Candidatos")">
+                                    Candidatos</a> </li>
+                                <li><a class="@ViewBag.SettingsUsuarioMenuClass" href="@Url.Action("Setup", "Usuarios")">
+                                    Usuarios</a> </li>
+                                <li><a class="@ViewBag.SettingsGeneralMenuClass" href="@Url.Action("Index", "Settings")">
+                                    Sistema</a> </li>
+                                <li><a class="@ViewBag.SettingsDiagnosticoMenuClass" href="@Url.Action("Index", "Diagnostic")">
+                                    Diagnóstico de inicio de sistema</a> </li>
+                            </ul>
+                        </li>
+                    }
+                </ul>

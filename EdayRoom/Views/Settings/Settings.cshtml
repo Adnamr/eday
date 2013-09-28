@@ -1,0 +1,58 @@
+﻿@model EdayRoom.Models.Setting
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ConfigurationMenuClass = "active";
+    ViewBag.SettingsGeneralMenuClass = "active";
+}
+<h2>Settings</h2>
+@using (Html.BeginForm("UpdateSettings", "Settings"))
+{
+    @Html.HiddenFor(m => m.id)
+    ;
+    <div class="mws-panel grid_8">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Activación de secciones</span>
+        </div>
+        <div class="mws-panel-body">
+            <table class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>Dashboard </th>
+                        <th>Participación </th>
+                        <th>Movilización </th>
+                        <th>Exit Polls </th>
+                        <th>Quick Count </th>
+                        <th>Totalización </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableDashboard)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableParticipacion)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableMovilizacion)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableExitPoll)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableQuickCount)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.enableTotalizacion)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+    <button>
+        Save
+    </button>
+}

@@ -1,0 +1,280 @@
+﻿@{
+    ViewBag.Title = "ExitPolls";
+    ViewBag.ExitPollsMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.exitpolls.js";
+    ViewBag.JqoteTemplate = "_ExitPollsJqoteTemplates";
+}
+
+@section headContent
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            exitpolls.init();
+            //MENU DE CONTROL DE PARTICIPACION
+            $(".add-data").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = exitpolls.createContactObject(item);
+                var panelHtml = $("#tpl-add-data-exitpolls").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#candidatoPanel").spin("small");
+
+                $.getJSON("/ExitPolls/GetCandidatos?centroId=" + contact.CentroId, function (data) {
+                    $("#candidatoPanel").spin(false);
+                    $("#candidatoPanel").append($("#tpl-add-data-candidato-row").jqote(data));
+                    $(data).each(function () {
+                        $("#candidato-" + this.CandidatoId).rules("add", {
+                            min: this.Valor
+                        });
+                    });
+                });
+                $("#agregarAlerta").click(function () {
+                    if ($(this).attr('checked')) {
+                        $("#valor-alert,#message-alert").show();
+                    } else {
+                        $("#valor-alert,#message-alert").hide();
+                    }
+                });
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#form-valor-exitpolls").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-exitpolls").valid()) {
+                        $('div#mws-container').unblock();
+                        if ($("#agregarAlerta").attr("checked") && $("#valor-alert").val() != '') {
+                            exitpolls.alertaExitPoll(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                        }
+
+                        exitpolls.updateExitPoll(item, contact, $("#form-valor-exitpolls").serializeArray());
+
+                        $.jGrowl($.format("ExitPoll reportada para centro \"{0}\".", contact.Centro), {
+                            header: "ExitPoll",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //MENU DE CONTROL DE ALERTAS
+            $(".add-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = exitpolls.createContactObject(item);
+                var panelHtml = $("#tpl-add-alert-exitpolls").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+
+                $("#alert-select-pane").spin("small");
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#alert-select-pane").spin(false);
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+
+                $("#form-valor-alerta").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#valor-alert").rules("add", {
+                    messages: {
+                        required: "Seleccione el tipo de alerta"
+                    }
+                });
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-alerta").valid()) {
+                        $('div#mws-container').unblock();
+
+                        exitpolls.alertaExitPoll(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                        //$("#timeline-alertas").append($("#tpl-timeline-alertas").jqote(contact));
+
+                        $.jGrowl($.format("Alerta reportada en centro \"{0}\".", contact.Centro), {
+                            header: "Alertas "
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //UPDATE ALERT DIALOG
+            $(".update-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = exitpolls.createContactObject(item);
+                var panelHtml = $("#tpl-update-alert-exitpolls").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#mensajes-alerta").append($("#tpl-alert-messages").jqote(contact.BlockingAlert.Messages));
+
+                $("#form-update-alert").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#message-alert").rules("add", {
+                    messages: {
+                        required: "Debe agregar un comentario"
+                    }
+                });
+                //    //BINDING de los action buttons
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-alert").valid()) {
+                        $('div#mws-container').unblock();
+                        exitpolls.updateAlertaExitPoll(item, contact, $("#message-alert").val());
+                        $.jGrowl("Alerta Actualizada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#cancel-alert-action').click(function () {
+                    if (confirm("Esta seguro de que desea cancelar esta alerta?")) {
+                        $('div#mws-container').unblock();
+                        exitpolls.cancelAlertaExitPoll(item, contact);
+                        $.jGrowl("Alerta Cancelada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                }
+                );
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //Correccion de datos
+            $(".edit-last-value").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = exitpolls.createContactObject(item);
+                var panelHtml = $("#tpl-update-last-participacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#form-update-last-data").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    },
+                    rules: {
+                        lastvalue: {
+                            min: contact.PreviousValue,
+                            max: contact.Votantes
+                        },
+                        lastcola: {
+                            min: 0,
+                            max: contact.Votantes
+                        }
+                    },
+                    messages: {
+                        lastvalue: {
+                            digits: "* Solo numeros ",
+                            min: $.format("El valor debe ser mayor que {0}"),
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        },
+                        lastcola: {
+                            digits: "* Solo numeros ",
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        }
+                    }
+                });
+
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-last-data").valid()) {
+                        $('div#mws-container').unblock();
+
+                        exitpolls.updateLastParticipacion(item, contact, $("#lastvalue").val(), $("#lastcola").val());
+
+                        $.jGrowl($.format("Participacion reportada para centro \"{0}\".", contact.Centro), {
+                            header: "Participacion",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+        });
+
+    </script>
+
+}
+<!-- Statistics Button Container -->
+<div class="mws-report-container clearfix">
+    &nbsp;
+</div>
+<div class="mws-panel grid_5">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-phone">Proximas llamadas
+            <select>
+                <option>5</option>
+                <option>10</option>
+                <option>15</option>
+            </select></span>
+    </div>
+    <div id="timeline-pendiente" class="timeline">
+    </div>
+</div>
+<div class="mws-panel grid_3">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alarm-bell">Errores y alertas</span>
+    </div>
+    <div id="timeline-alertas" class="timeline">
+    </div>
+</div>

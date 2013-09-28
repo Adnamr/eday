@@ -1,0 +1,221 @@
+﻿@using EdayRoom.Models
+@{
+    Layout = null;
+    var centro = (Centro)ViewData["centro"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdminCentro</title>
+</head>
+<body>
+    <script type="text/javascript">
+
+        function isNumeric(value) {
+            return value != null && value.toString().match(/^[-]?\d*\.?\d*$/);
+        }
+
+        $(document).ready(function () {
+            $("#mesas-volver").click(function () {
+                $("#panel-mesas").hide("fade", function () {
+                    $("#panel-mesas-content").html('');
+                    $("#panel-centros").show("fade");
+
+                });
+
+            });
+
+            $(".mesa-link").click(function () {
+                $("#panel-detalle-mesas-content").hide();
+                var idMesa = $(this).attr("mesa-id");
+
+                $("#panel-mesas").hide("fade", function () {
+                    $("#panel-detalle-mesas").show();
+                    $("#panel-detalle-mesas-spinner").show();
+                    $("#panel-detalle-mesas-spinner").spin("huge");
+                    loadMesa(idMesa);
+                });
+
+            });
+            var chartCentro;
+            // define the options
+            var options = {
+                chart: {
+                    zoomType: 'x',
+                    renderTo: 'mws-line-chart'
+                },
+                title: {
+                    text: 'Participacion vs Cola'
+                },
+                credits: {
+                    href: null,
+                    text: "Generado por EdayRoom"
+                },
+
+                xAxis: {
+                    type: 'datetime',
+                    tickWidth: 0,
+                    gridLineWidth: 1,
+                    labels: {
+                        align: 'left',
+                        x: 3,
+                        y: -3
+                    }
+                },
+                yAxis: [{
+                    // left y axis
+                    title: {
+                        text: null
+                    },
+                    labels: {
+                        align: 'left',
+                        x: 3,
+                        y: 16,
+                        formatter: function () {
+                            return Highcharts.numberFormat(this.value, 0);
+                        }
+                    },
+                    showFirstLabel: false
+                }, {
+                    // right y axis
+                    linkedTo: 0,
+                    gridLineWidth: 0,
+                    opposite: true,
+                    title: {
+                        text: null
+                    },
+                    labels: {
+                        align: 'right',
+                        x: -3,
+                        y: 16,
+                        formatter: function () {
+                            return Highcharts.numberFormat(this.value, 0);
+                        }
+                    },
+                    showFirstLabel: false
+                }],
+                tooltip: {
+                    shared: true,
+                    crosshairs: true
+                },
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    hs.htmlExpand(null, {
+                                        pageOrigin: {
+                                            x: this.pageX,
+                                            y: this.pageY
+                                        },
+                                        headingText: this.series.name,
+                                        maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' +
+                                            this.y + ' visits',
+                                        width: 200
+                                    });
+                                }
+                            }
+                        },
+                        marker: {
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [
+                         {
+                             type: 'column',
+                             name: 'Cola'
+                         }, {
+                             type: 'column',
+                             name: 'Participacion Parcial'
+                         },
+                {
+                    name: 'Participacion'
+                }]
+            };
+
+            $.getJSON('@Url.Action("GetChartData", new { idCentro = centro.id })', null, function (data) {
+                var participacionArray = new Array();
+                var participacionParcialArray = new Array();
+                var colaArray = new Array();
+
+                for (var i = 0; i < data.participacion.length; i++) {
+                    var utc = Date.UTC(data.participacion[i].year, data.participacion[i].month, data.participacion[i].day, data.participacion[i].hour, data.participacion[i].min);
+                    colaArray.push([utc, data.participacion[i].cola]);
+                    participacionArray.push([utc, data.participacion[i].participacion]);
+                    participacionParcialArray.push([utc, data.participacion[i].value]);
+                }
+                options.series[0].data = colaArray;
+                options.series[1].data = participacionParcialArray;
+                options.series[2].data = participacionArray;
+
+                chartCentro = new Highcharts.Chart(options);
+            });
+
+        });
+    </script>
+    <div>
+        <a href="#centros" id="mesas-volver">volver</a>
+    </div>
+    <br />
+    <div class="mws-panel grid_5">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Mesas del centro "@centro.Nombre" </span>
+        </div>
+        <div class="mws-panel-body">
+            <table id="tabla-mesas" class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Contacto</th>
+                        <th>Telf</th>
+                        <th>Votantes</th>
+                        <th>Participacion</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Mesa m in (List<Mesa>)ViewData["mesas"])
+                    {
+                        <tr class="gradeX">
+                            <td>
+                                <a href="#mesa=@m.id" mesa-id="@m.id" class="mesa-link">Mesa @m.numero </a>
+                            </td>
+                            <td>
+                                @m.Testigoes.FirstOrDefault().nombre
+                            </td>
+                            <td>
+                                @m.Testigoes.FirstOrDefault().numero
+                            </td>
+                            <td class="center">
+                                @m.votantes
+                            </td>
+                            <td class="center">
+                                <span class="participacion" mesaId="@m.id" votantes="@m.votantes">@m.Participacions.Max(p => p.conteo)</span>
+                            </td>
+                            <td class="center">
+                                <span id="pct-@m.id" >
+                                    @(100 * m.Participacions.Max(p => p.conteo) / m.votantes)
+                                    % </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mws-panel grid_3">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Participacion (proyectar al total
+                <input type="checkbox" />)</span>
+        </div>
+        <div class="mws-panel-body">
+            <div class="mws-panel-content">
+                <div id="mws-line-chart" style="height: 250px; width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

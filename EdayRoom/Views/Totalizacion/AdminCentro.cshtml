@@ -1,0 +1,156 @@
+﻿@using EdayRoom.Models
+@{
+    Layout = null;
+    var centro = (Centro)ViewData["centro"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdminCentro</title>
+</head>
+<body>
+    <script type="text/javascript">
+
+        function isNumeric(value) {
+            return value != null && value.toString().match(/^[-]?\d*\.?\d*$/);
+        }
+
+        $(document).ready(function () {
+            $("#mesas-volver").click(function () {
+                oTable.fnDraw();
+                $("#panel-mesas").hide("fade", function () {
+                    $("#panel-mesas-content").html('');
+                    $("#panel-centros").show("fade");
+
+                });
+
+            });
+            $(".mesa-link").click(function () {
+                $("#panel-detalle-mesas-content").hide();
+                var idMesa = $(this).attr("mesa-id");
+
+                $("#panel-mesas").hide("fade", function () {
+                    $("#panel-detalle-mesas").show();
+                    $("#panel-detalle-mesas-spinner").show();
+                    $("#panel-detalle-mesas-spinner").spin("huge");
+                    loadMesa(idMesa);
+                });
+
+            });
+//            // define the options
+//            var chartCentro = new Highcharts.Chart(
+//                {
+//                    chart: {
+//                        zoomType: 'x',
+//                        renderTo: 'mws-line-chart'
+//                    },
+//                    credits: {
+//                        href: null,
+//                        text: "Generado por EdayRoom"
+//                    },
+//                    title: {
+//                        text: 'Totalización'
+//                    },
+//                    tooltip: {
+//                        formatter: function () {
+//                            return '<b>' + this.point.name + '</b>: ' + this.percentage.toFixed(2) + ' % (' + this.point.y + ' votos)';
+//                        }
+//                    },
+//                    plotOptions: {
+//                        pie: {
+//                            allowPointSelect: true,
+//                            cursor: 'pointer',
+//                            dataLabels: {
+//                                enabled: true,
+//                                color: '#000000',
+//                                connectorColor: '#000000',
+//                                formatter: function () {
+//                                    return '<b>' + this.point.name + '</b>: ' + this.percentage.toFixed(2) + ' % ';
+//                                }
+//                            },
+//                            showInLegend: true
+//                        }
+//                    },
+//                    series: [{
+//                        type: 'pie',
+//                        name: 'Porcentaje de votos'
+//                    }]
+//                }, function (chart) {
+
+//                    $.getJSON('@Url.Action("GetChartData", new { idCentro = centro.id })', null, function (data) {
+//                        var seriesData = new Array();
+//                        for (var i = 0; i < data.length; i++) {
+//                            seriesData.push([data[i].Nombre, data[i].Votos]);
+//                        }
+//                        chart.series[0].setData(seriesData, true);
+//                    });
+//                });
+        });
+    </script>
+    <br />
+    <div class="mws-panel grid_8">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Mesas del centro "@centro.Nombre" </span>
+        </div>
+        <div class="mws-panel-body">
+            <table id="tabla-mesas" class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Votantes</th>
+                        <th>Participacion</th>
+                        <th>Totalizado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Mesa m in (List<Mesa>)ViewData["mesas"])
+                    {
+                        bool totalizada = m.Totalizacions.Any();
+                        <tr class="gradeX">
+                            <td>
+                                <a href="#mesa=@m.id" mesa-id="@m.id" class="mesa-link">Mesa @m.numero </a>
+                            </td>
+                            <td class="center">
+                                @m.votantes
+                            </td>
+                            <td class="center">
+                                <span class="participacion" mesaId="@m.id" votantes="@m.votantes">
+                                    @m.Totalizacions.Sum(p => p.valor)
+                                </span>
+                            </td>
+                            <td class="center">
+                                @if (totalizada)
+                                {
+                                    <div class="mws-ic-16 ic-accept tableIcon16">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mws-ic-16 ic-cross tableIcon16">
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mws-panel grid_4" style="display:none;">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Totalizacion (proyectar al total
+                <input type="checkbox" />)</span>
+        </div>
+        <div class="mws-panel-body">
+            <div class="mws-panel-content">
+                <div id="mws-line-chart" style="height: 250px; width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
+            <div class="grid_1 left">
+            <input type="button" id="mesas-volver" value="Regresar" style="width: 96px;" class="mws-button red small" />
+            </div>
+
+</body>
+</html>

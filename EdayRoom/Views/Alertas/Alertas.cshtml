@@ -1,0 +1,363 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Alertas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ConfigurationMenuClass = "active";
+    ViewBag.SettingsAlertaMenuClass = "active";
+    var alertas = (List<Alerta>) ViewData["alertas"];
+}
+
+<script type="text/jqote" id="tpl-alertaItem">
+       <![CDATA[ 
+           <option value="<*= this.id *>"><*= this.name*></option>
+       ]]>
+</script>
+<script type="text/jqote" id="tpl-addAlerta">
+       <![CDATA[
+     <form id="form-add-alerta" class="data-loading-wrapper mws-form mws-panel"> 
+                <div class="mws-panel-header"><span class="mws-i-24 i-alert">Crear nueva alerta</span></div> 
+                <div class="data-loading-form"> 
+
+                    <label>Nombre:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="nombreAlerta" name="nombreAlerta" class="mws-textinput required" type="text"/> 
+                    </div>
+                    <label>Cancelable por:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <select id="canceledBy" name="canceledBy">
+                            <option value="all">Todos los usuarios</option>
+                            <option value="leader">Lideres de grupo y admins</option>
+                            <option value="admin">Solo administradores</option>
+                        </select>
+                    </div>
+                    <label>Bloquear contacto:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input type="radio" id="blockContact" name="alertType" checked="checked"/>
+                    </div>
+                    <label>Iniciar cuenta regresiva:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input type="radio" id="cuentaRegresiva" name="alertType"/>
+                    </div>
+        
+                    <div id="cuentaRegresivaPanel" style="display:none;">
+                        <label>Tiempo:</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                        <input id="tiempoRegresivo" name="tiempoRegresivo" class="mws-textinput required numeric" type="number" value="0"/> 
+                        </div>
+                        <label>Maximo nro intentos (0 para infinitos):</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                            <input id="maxRepeats" name="maxRepeats" class="mws-textinput required numeric" type="number" value="0"/> 
+                        </div>
+                        <label>Alerta asociada</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                            <select id="asocAlerta" name="asocAlert">
+                                <option value=''> Ninguna </option>
+                            </select> 
+                        </div>
+                    </div>
+
+                    <div class="data-loading-buttons" style="clear:both"> 
+                        <input type="button" id="add-data-action" value="Agregar Datos" class="mws-button green small"/> 
+                        <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+                </div>
+            </form>
+       ]]>
+</script>
+
+<script type="text/jqote" id="tpl-editAlerta">
+       <![CDATA[
+     <form id="form-edit-alerta" class="data-loading-wrapper mws-form mws-panel"> 
+                <div class="mws-panel-header"><span class="mws-i-24 i-alert">Editar alerta</span></div> 
+                <div class="data-loading-form"> 
+
+                    <label>Nombre:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="nombreAlerta" name="nombreAlerta" class="mws-textinput required" type="text" value="<*= this.name *>"/> 
+                    </div>
+                                        <label>Cancelable por:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <select id="canceledBy" name="canceledBy">
+                            <option value="all">Todos los usuarios</option>
+                            <option value="leader">Lideres de grupo y admins</option>
+                            <option value="admin">Solo administradores</option>
+                        </select>
+                    </div>
+
+                    <label>Bloquear contacto:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input type="radio" id="blockContact" name="alertType"<* if(!this.regresivo){*>checked="checked"<*}*>/>
+                    </div>
+                    <label>Iniciar cuenta regresiva:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input type="radio" id="cuentaRegresiva" name="alertType" <* if(this.regresivo){*>checked="checked"<*}*>/>
+                    </div>
+        
+                    <div id="cuentaRegresivaPanel" <* if(!this.regresivo){*>style="display:none;"<*}*>>
+                        <label>Minutos cuenta regresiva:</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                        <input id="tiempoRegresivo" name="tiempoRegresivo" class="mws-textinput required numeric" type="number" value="<*= this.tiempo *>"/> 
+                        </div>
+                                                <label>Maximo nro intentos (0 para infinitos):</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                            <input id="maxRepeats" name="maxRepeats" class="mws-textinput required numeric" type="number" value="<*= this.maxRepeats *>"/> 
+                        </div>
+                        <label>Alerta asociada</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                            <select id="asocAlerta" name="asocAlert">
+                                <option value=''> Ninguna </option>
+                            </select> 
+                        </div>
+
+                    </div>
+
+                    <div class="data-loading-buttons" style="clear:both"> 
+                        <input type="button" id="add-data-action" value="Modificar Alerta" class="mws-button green small"/> 
+                        <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+                </div>
+            </form>
+       ]]>
+</script>
+<script type="text/javascript">
+    var oTable;
+    $(document).ready(function() {
+        oTable = $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "/Alertas/GetAllAlertas"
+        });
+
+        $(".deleteAlerta").live("click", function() {
+
+            if (confirm("Esta seguro de que desea borrar esta alerta?")) {
+                $.ajax({
+                    url: "/Alertas/DeleteAlerta/" + $(this).attr("alerta-id"),
+                    success: function() {
+                        oTable.fnDraw();
+                    }
+                });
+            }
+
+
+        });
+        $(".editAlerta").live("click", function() {
+            var id = $(this).attr("alerta-id");
+            $.getJSON("/Alertas/GetAlerta/" + id,
+                function(data) {
+                    var panelHtml = $("#tpl-editAlerta").jqote(data);
+                    $('body').block({
+                        message: panelHtml,
+                        css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                        focusInput: true,
+                        overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                    });
+                    $("#canceledBy").val(data.canceledBy);
+                    $.getJSON('/Alertas/GetAlertas', function(alertas) {
+                        $("#asocAlerta").append($("#tpl-alertaItem").jqote(alertas));
+                        $("#asocAlerta").val(data.asocAlerta);
+                    });
+
+                    $("#canceledBy").val(data.canceledBy);
+                    $("#blockContact, #cuentaRegresiva").change(function() {
+                        if ($("#cuentaRegresiva").is(":checked")) {
+                            $("#cuentaRegresivaPanel").show();
+                            if ($("#tiempoRegresivo").val() == '') {
+                                $("#tiempoRegresivo").val(0);
+                            }
+                        } else {
+                            $("#cuentaRegresivaPanel").hide();
+                        }
+                    });
+                    $("#blockContact, #cuentaRegresiva").change();
+
+                    //BINDING de los action buttons
+                    $('#add-data-action').click(function() {
+                        var alerta = {
+                            name: $("#nombreAlerta").val(),
+                            blocking: $("#blockContact").is(":checked"),
+                            regresivo: $("#cuentaRegresiva").is(":checked"),
+                            tiempo: $("#cuentaRegresiva").is(":checked") ? $("#tiempoRegresivo").val() : 0,
+                            canceledBy: $("#canceledBy").val(),
+                            maxRepeats: $("#maxRepeats").val(),
+                            asocAlerta: $("#asocAlerta").val(),
+                            id: id
+                        };
+                        $.ajax({
+                            url: '/Alertas/EditAlerta',
+                            data: alerta,
+                            type: "POST",
+                            success: function() {
+                                oTable.fnDraw();
+                                $('body').unblock();
+                                alert("Alerta Editada");
+                            }
+                        });
+
+                    });
+                    $('#add-data-cancel').click(function() {
+                        $('body').unblock();
+
+                    });
+                }
+            );
+
+        });
+
+        $("#btn-addAlerta").click(function() {
+            var panelHtml = $("#tpl-addAlerta").jqote();
+            $('body').block({
+                message: panelHtml,
+                css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                focusInput: true,
+                overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+            });
+            $.getJSON('/Alertas/GetAlertas', function(data) {
+                $("#asocAlerta").append($("#tpl-alertaItem").jqote(data));
+            });
+
+            $("#blockContact, #cuentaRegresiva").change(function() {
+                if ($("#cuentaRegresiva").is(":checked")) {
+                    $("#cuentaRegresivaPanel").show();
+                    if ($("#tiempoRegresivo").val() == '') {
+                        $("#tiempoRegresivo").val(0);
+                    }
+                } else {
+                    $("#cuentaRegresivaPanel").hide();
+                }
+            });
+
+            $("#form-add-alerta").validate({
+                invalidHandler: function() {
+                    if ($.fn.effect) {
+                        $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                    }
+                },
+                rules: {
+                    tiempoRegresivo: {
+                        min: 0,
+                        max: 300
+                    },
+                    maxRepeats: {
+                        min: 0
+                    }
+                },
+                messages: {
+                    nombreAlerta: {
+                        required: "* Obligatorio"
+                    },
+                    tiempoRegresivo: {
+                        digits: "* Solo numeros ",
+                        min: $.format("El valor debe ser mayor que {0}"),
+                        max: $.format("El valor debe ser menor que {0}"),
+                        required: "* Obligatorio"
+                    },
+                    maxRepeats: {
+                        digits: "* Solo numeros ",
+                        min: $.format("El valor debe ser mayor que {0}"),
+                        required: "* Obligatorio"
+                    }
+                }
+            });
+            //BINDING de los action buttons
+            $('#add-data-action').click(function() {
+                if ($("#form-add-alerta").valid()) {
+                    var alerta = {
+                        name: $("#nombreAlerta").val(),
+                        blocking: $("#blockContact").is(":checked"),
+                        regresivo: $("#cuentaRegresiva").is(":checked"),
+                        tiempo: $("#cuentaRegresiva").is(":checked") ? $("#tiempoRegresivo").val() : 0,
+                        canceledBy: $("#canceledBy").val(),
+                        maxRepeats: $("#maxRepeats").val(),
+                        asocAlerta: $("#asocAlerta").val()
+                    };
+
+                    $.ajax({
+                        url: '/Alertas/CrearAlerta',
+                        data: alerta,
+                        type: "POST",
+                        success: function() {
+                            oTable.fnDraw();
+                            $('body').unblock();
+                            alert("Alerta creada");
+                        }
+                    });
+
+                }
+
+            });
+            $('#add-data-cancel').click(function() {
+                $('body').unblock();
+            });
+        });
+    });
+</script>
+
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alert">Configuración de Alertas</span>
+    </div>
+    <div class="mws-panel-body">
+        <table class="mws-datatable mws-table">
+            <thead>
+                <tr>
+                    <th>Nombre </th>
+                    <th>Permisos </th>
+                    <th>Bloqueo? </th>
+                    <th>Cuenta Regresiva? </th>
+                    <th>Tiempo </th>
+                    <th>Repeticiones</th>
+                    <th>Alerta Asoc. </th>
+                    <th style="width: 30px !important;"> </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Alerta a in alertas)
+                {
+                    <tr>
+                        <td>
+                            @a.name
+                        </td>
+                        <td>
+                            @if (a.blocking)
+                            {
+                                <div class="mws-ic-16 ic-accept" style="height: 16px; width: 16px;">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mws-ic-16 ic-cross" style="height: 16px; width: 16px;">
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @if (a.regresivo)
+                            {
+                                <div class="mws-ic-16 ic-accept" style="height: 16px; width: 16px;">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mws-ic-16 ic-cross" style="height: 16px; width: 16px;">
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @a.tiempo
+                        </td>
+                        <td>
+                            <div class="mws-ic-16 ic-edit editAlerta" alerta-id="@a.id" style="float: left; height: 16px; width: 16px;">
+                            </div>
+                            <div class="mws-ic-16 ic-trash deleteAlerta"  alerta-id="@a.id" style="float: left; height: 16px; margin-left: 10px; width: 16px;">
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <br />
+        <div style="text-align: right;">
+            <button class="green small ui-button " id="btn-addAlerta">Crear Nueva Alerta </button>
+        </div>
+        <div id="container">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,302 @@
+﻿@using System.Web.Script.Serialization
+@using EdayRoom.Models
+@{
+    Layout = null;
+    var mesa = (Mesa) ViewData["mesa"];
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AdminCentro</title>
+        <style type="text/css">
+            .editInput { width: 50px; }
+        </style>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/edayroom/wr.movilizacion.js")"> </script>
+        <script type="text/html" id="tpl-add-data-movilizacion">
+            <![CDATA[
+                <form id="form-valor-movilizacion" class="data-loading-wrapper mws-form mws-panel"> 
+                    <div class="mws-panel-header"><span class="mws-i-24 i-list">Carga de datos</span></div> 
+                    <div class="data-loading-form"> 
+                        <label>Centro de Votacion:</label> <div class="data-loading-field"><*= this.Centro *></div> 
+                        <label>Mesa #:</label> <div class="data-loading-field"><*= this.Mesa *></div> 
+                        <label>Votantes en mesa:</label> <div class="data-loading-field"><*= this.Votantes*> </div> 
+                        <label>Contacto:</label> <div class="data-loading-field"><*= this.NombreTestigo *></div> 
+                        <label>Numero Telefonico:</label> <div class="data-loading-field"><*= this.Numero *> </div> 
+                        <label>Ultima Actualizacion:</label> <div class="data-loading-field"><*= this.LastUpdateStr *> </div> 
+                        <label>Ultimo Valor:</label> <div class="data-loading-field"><*= this.LastValue *> </div> 
+                        <label>Nuevo Valor:</label> 
+                        <div class="data-loading-field mws-form-item "> 
+                            <input id="valormovilizacion" name="valormovilizacion" class="mws-textinput required digits" type="text"/> 
+                        </div>
+                        <div class="data-loading-buttons"> 
+                            <input type="button" id="add-data-action" value="Agregar Datos" class="mws-button green small"/> 
+                            <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+                    </div>
+                </form>
+                ]]>
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#detalle-mesas-volver").click(function() {
+                    $("#panel-detalle-mesas").hide("fade", function() {
+                        $("#panel-detalle-mesas-content").html('');
+                        $("#panel-mesas").show("fade");
+                    });
+                });
+                var chartMesa;
+                $(document).ready(function() {
+                    // define the options
+                    var options = {
+                        chart: {
+                            zoomType: 'x',
+                            renderTo: 'mws-line-chart-mesa'
+                        },
+                        pane: {
+                            size: '80%'
+                        },
+                        credits: {
+                            href: null,
+                            text: "Generado por EdayRoom"
+                        },
+                        title: {
+                            text: 'Participacion vs Cola'
+                        },
+                        xAxis: {
+                            type: 'datetime',
+                            tickWidth: 0,
+                            gridLineWidth: 1,
+                            labels: {
+                                align: 'left',
+                                x: 3,
+                                y: -3
+                            }
+                        },
+                        yAxis: [{
+// left y axis
+                            title: {
+                                text: null
+                            },
+                            labels: {
+                                align: 'left',
+                                x: 3,
+                                y: 16,
+                                formatter: function() {
+                                    return Highcharts.numberFormat(this.value, 0);
+                                }
+                            },
+                            showFirstLabel: false
+                        }, {
+// right y axis
+                            linkedTo: 0,
+                            gridLineWidth: 0,
+                            opposite: true,
+                            title: {
+                                text: null
+                            },
+                            labels: {
+                                align: 'right',
+                                x: -3,
+                                y: 16,
+                                formatter: function() {
+                                    return Highcharts.numberFormat(this.value, 0);
+                                }
+                            },
+                            showFirstLabel: false
+                        }],
+                        tooltip: {
+                            shared: true,
+                            crosshairs: true
+                        },
+                        plotOptions: {
+                            series: {
+                                cursor: 'pointer',
+                                point: {
+                                    events: {
+                                        click: function() {
+                                            hs.htmlExpand(null, {
+                                                pageOrigin: {
+                                                    x: this.pageX,
+                                                    y: this.pageY
+                                                },
+                                                headingText: this.series.name,
+                                                maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' +
+                                                this.y + ' visits',
+                                                width: 200
+                                            });
+                                        }
+                                    }
+                                },
+                                marker: {
+                                    lineWidth: 1
+                                }
+                            }
+                        },
+                        series: [
+                            {
+                                name: 'Participacion',
+                                pointPlacement: 'on'
+                            }, {
+                                name: 'Cola',
+                                pointPlacement: 'on'
+                            }]
+                    };
+
+                    $.getJSON('@Url.Action("GetChartData", new {idMesa = mesa.id})', null, function(data) {
+                        var movilizacionArray = new Array();
+                        for (var i = 0; i < data.movilizacion.length; i++) {
+                            movilizacionArray.push([Date.UTC(data.movilizacion[i].year, data.movilizacion[i].month, data.movilizacion[i].day, data.movilizacion[i].hour, data.movilizacion[i].min), data.movilizacion[i].value]);
+                        }
+                        options.series[0].data = movilizacionArray;
+                        chartMesa = new Highcharts.Chart(options);
+                    });
+
+                });
+            });
+        </script>
+        <div>
+            <a href="#centros" id="detalle-mesas-volver">volver</a>
+        </div>
+        <br />
+        <div class="mws-panel grid_4">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-table-1"> Mesa #@mesa.numero - Centro "@mesa.Centro.Nombre" - Actividad</span>
+            </div>
+            <div class="mws-panel-body">
+                <table class="mws-datatable mws-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Movilización</th>
+                            <th>Testigo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Movilizacion p in (List<Movilizacion>) ViewData["Movilizacion"])
+                        {
+                            <tr class="gradeX">
+                                <td>
+                                    @p.fecha.ToString("dd/MM/yyyy hh:mm tt")
+                                </td>
+                                <td>
+                                    <span id="conteo-@p.id" value="@p.conteo">
+                                        @p.conteo
+                                    </span>
+                                    <input id="conteoInput-@p.id" value="@p.conteo" class="editInput" style="display: none;"/>                            
+                                </td>
+                                <td class="center">
+                                    @p.Movilizador.nombre
+                                </td>
+                                <td>
+                                    <div id="lnkEdit-@p.id" movilizacion-id="@p.id"  class="mws-ic-16 ic-edit editMovilizacion  tableIcon16 clickable" alerta-id="1" style="float: left;">
+                                    </div>
+                                    <button id="btnEdit-@p.id" class="acceptEdit" style="display: none" movilizacion-id="@p.id">
+                                        OK</button>
+
+
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+                <input type="button" value="Agregar Datos" class="mws-button add-data green small right" />
+                <script type="text/javascript">
+                    $(".add-data").live('click', function() {
+                        var contact = @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["contact"]));
+                        var panelHtml = $("#tpl-add-data-movilizacion").jqote(contact);
+                        $('div#mws-container').block({
+                            message: panelHtml,
+                            css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                            focusInput: true,
+                            overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                        });
+                        //ACTIVO LAS RESTRICCIONES AL CAMPO
+                        $("#form-valor-movilizacion").validate({
+                            invalidHandler: function() {
+                                if ($.fn.effect) {
+                                    $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                                }
+                            },
+                            rules: {
+                                valormovilizacion: {
+                                    min: contact.LastValue,
+                                    max: contact.Votantes
+                                },
+                                valorcola: {
+                                    min: 0,
+                                    max: contact.Votantes
+                                }
+                            },
+                            messages: {
+                                valormovilizacion: {
+                                    digits: "* Solo numeros ",
+                                    min: $.format("El valor debe ser mayor que {0}"),
+                                    max: $.format("El valor debe ser menor que {0}"),
+                                    required: "* Obligatorio"
+                                },
+                                valorcola: {
+                                    digits: "* Solo numeros ",
+                                    max: $.format("El valor debe ser menor que {0}"),
+                                    required: "* Obligatorio"
+                                }
+                            }
+                        });
+                        //BINDING de los action buttons
+                        $('#add-data-action').click(function() {
+                            if ($("#form-valor-movilizacion").valid()) {
+                                $('div#mws-container').unblock();
+                                movilizacion.updateMovilizacion(null, contact, $("#valormovilizacion").val(),
+                                    function() {
+                                        loadMesa(@mesa.id);
+                                        $.jGrowl($.format("Movilizacion reportada para centro \"{0}\".", contact.Centro), {
+                                            header: "Movilizacion",
+                                            animateOpen: {
+                                                opacity: 'show'
+                                            },
+                                            animateClose: {
+                                                opacity: 'hide'
+                                            }
+                                        });
+                                    });
+                            }
+                        });
+                        $('#add-data-cancel').click(function() {
+                            $('div#mws-container').unblock();
+                        });
+                    });
+                    $(".editMovilizacion").click(function() {
+                        var id = $(this).attr('movilizacion-id');
+                        $("#conteo-" + id + ", #cola-" + id + ",#conteoInput-" + id + ", #colaInput-" + id).toggle();
+                        $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+                    });
+                    $(".acceptEdit").click(function() {
+                        var id = $(this).attr('movilizacion-id');
+                        $("#conteo-" + id + ", #cola-" + id + ",#conteoInput-" + id + ", #colaInput-" + id).toggle();
+                        $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+                        movilizacion.updateSingleMovilizacion(id, $("#conteoInput-" + id).val(),
+                            function() {
+                                loadMesa(@mesa.id);
+                            }
+                        );
+
+                    });
+
+                </script>
+            </div>
+        </div>
+        <div class="mws-panel grid_4">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-table-1">Movilización en la mesa </span>
+            </div>
+            <div class="mws-panel-body">
+                <div class="mws-panel-content">
+                    <div id="mws-line-chart-mesa" style="height: 250px; width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

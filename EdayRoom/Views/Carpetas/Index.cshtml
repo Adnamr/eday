@@ -1,0 +1,140 @@
+﻿@using EdayRoom.Models
+@{
+    Layout = null;
+    var users = (List<UsuariosIdentificacion>) ViewData["usuarios"];
+    var db = new edayRoomEntities();
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Index</title>
+    <style>
+        body {
+            font-family: Georgia, "Times New Roman", Times, serif !important;
+        }
+        .break {
+            page-break-after: always;
+        }
+        .testigos {
+            border-collapse: collapse;
+            padding: 0px;
+        }
+        .testigos td {
+            padding: 1px;
+            border: 1px solid black;
+            text-align: left;
+        }
+    </style>
+</head>
+    <body>
+        <div style="text-align: center">
+        
+        @foreach (var u in users)
+        {
+            <div class="identificacion">
+                <h1>
+                    @u.nombre [#@u.numero_id]
+                </h1>
+                <h2> C&eacute;dula @u.ci </h2>
+            
+                <h2> Zona #@u.zona </h2>
+                <h2> Mesa #@u.mesa </h2>
+                <br/>
+                <h1 style="font-size: 40px;"> @u.modulo </h1>
+
+                @if ((!u.isleader ?? false) && !string.IsNullOrEmpty(u.lider_nombre))
+                {
+                    <h1> Lider de grupo</h1>
+                    <h2>@u.lider_nombre</h2>
+                    <h2>Tlf. @u.tlf</h2>
+                    <br />
+                }else
+                {
+                    var hijos = users.Where(uu => uu.id_leader == u.numero_id);
+                    <h3>
+                    Equipo de trabajo
+                    </h3>
+                    <ol style="width:400px; margin:auto;text-align:left;">
+                    @foreach (var uu in hijos)
+                    {
+                        <li>
+                            @uu.nombre [#@uu.numero_id]<br/>
+                            tlf: @uu.telefono
+                        </li>
+                    }
+                    </ol>
+                }
+            </div>
+            <div class="break"></div>
+                
+                var user = db.users.SingleOrDefault(us => us.apellido == u.numero_id);
+                if (user.participacion || user.movilizacion || true)
+                {
+                    <div>
+                        Usuario: @user.username <br/>
+                        Password: @u.password <br/>
+                        Extensión: @u.numero_id <br/>
+                
+                        <table style="font-size: 10px;" class="testigos">
+                            <thead>
+                                <th>
+                                    Nombre Testigo
+                                </th>
+                                <th>
+                                    Telefono
+                                </th>
+                                <th>
+                                    Centro
+                                </th>
+                                <th>
+                                    Estado
+                                </th>
+                                <th>
+                                    Municipio
+                                </th>
+                            </thead>
+                            <tbody>
+                                @if (user.participacion)
+                                {
+                                    foreach (var ap in user.AsignacionParticipacions)
+                                    {
+                                        <tr>
+                                            <td>@ap.Mesa.Testigoes.First(t => t.activo).nombre</td>
+                                            <td>@ap.Mesa.Testigoes.First(t => t.activo).numero</td>
+                                            <td>@ap.Mesa.Centro.Nombre</td>
+                                            <td>@ap.Mesa.Centro.unidadGeografica1</td>
+                                            <td>@ap.Mesa.Centro.unidadGeografica2</td>
+                                        </tr>
+                                    }
+                                }
+                    
+                                @if (user.movilizacion)
+                                {
+                                    foreach (var ap in user.AsignacionMovilizacions)
+                                    {
+                                        <tr>
+                                            <td>@ap.Centro.Movilizadors.First(t => t.activo).nombre</td>
+                                            <td>@ap.Centro.Movilizadors.First(t => t.activo).numero</td>
+                                            <td>@ap.Centro.Nombre</td>
+                                            <td>@ap.Centro.unidadGeografica1</td>
+                                            <td>@ap.Centro.unidadGeografica2</td>
+                                        </tr>
+                                    }
+                                }  
+                
+
+                            </tbody>
+                        </table>
+
+                
+                    </div>
+                    <div class="break"></div>
+                }
+            
+                
+        }
+        </div>
+    </body>
+</html>

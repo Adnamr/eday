@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "title";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Diagnostico para inicio de la ejecucion</h2>
+<table class="mws-datatable mws-table">
+    <thead>
+        <th>Item</th>
+        <th>Mensaje</th>
+        <th>Status</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Carga de centros de votacion
+            </td>
+            <td>
+                @if ((int)ViewData["centros"] == 0)
+                {
+                    <span>No se ha cargado ningun centro. Por favor inicie la carga <a href="@Url.Action("Index", "Centros")">
+                        aqui </a></span>
+                }
+                else
+                {
+                    <span>Hay @ViewData["centros"] centros cargados en el sistema </span>
+                }
+            </td>
+            <td>
+                @if ((int)ViewData["centros"] == 0)
+                {
+                    <div class="mws-ic-16 ic-cross tableIcon16">
+                    </div>
+                                  
+                }
+                else
+                {
+                    <div class="mws-ic-16 ic-accept tableIcon16">
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Mesas de votacion
+            </td>
+            <td>
+                @if ((int)ViewData["mesas"] == 0)
+                {
+                    <span>No se ha cargado ninguna mesa electoral. Por favor inicie la carga <a href="@Url.Action("Index", "Mesas")">
+                        aqui </a></span>
+                }
+                else
+                {
+                    <span>Hay @ViewData["mesas"] mesas cargadas en el sistema </span>
+                }
+            </td>
+            <td>
+                @if ((int)ViewData["mesas"] == 0)
+                {
+                    <div class="mws-ic-16 ic-cross tableIcon16">
+                    </div>
+                                  
+                }
+                else
+                {
+                    <div class="mws-ic-16 ic-accept tableIcon16">
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Testigos de participacion y totalizacion
+            </td>
+            <td>
+                @if ((int)ViewData["testigos"] == 0)
+                {
+                    <span>No se ha cargado ningun testigo. Por favor inicie la carga <a href="@Url.Action("Index", "Testigos")">
+                        aqui </a></span>
+                }
+                else
+                {
+                    <span>Hay @ViewData["testigos"] testigos cargados en el sistema </span>
+                }
+            </td>
+            <td>
+                @if ((int)ViewData["testigos"] == 0)
+                {
+                    <div class="mws-ic-16 ic-cross tableIcon16">
+                    </div>
+                                  
+                }
+                else
+                {
+                    <div class="mws-ic-16 ic-accept tableIcon16">
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Testigos de movilizacion
+            </td>
+            <td>
+                @if ((int)ViewData["movilizadores"] == 0)
+                {
+                    <span>No se ha cargado ningun movilizadores. Por favor inicie la carga <a href="@Url.Action("Index", "Testigos")">
+                        aqui </a></span>
+                }
+                else
+                {
+                    <span>Hay @ViewData["movilizadores"] movilizadores cargados en el sistema </span>
+                }
+            </td>
+            <td>
+                @if ((int)ViewData["movilizadores"] == 0)
+                {
+                    <div class="mws-ic-16 ic-cross tableIcon16">
+                    </div>
+                                  
+                }
+                else
+                {
+                    <div class="mws-ic-16 ic-accept tableIcon16">
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Testigos de exitpoll
+            </td>
+            <td>
+                @if ((int)ViewData["testigosExitPoll"] == 0)
+                {
+                    <span>No se ha cargado ningun testigo. Por favor inicie la carga <a href="@Url.Action("Index", "Testigos")">
+                                                                                         aqui </a></span>
+                }
+                else
+                {
+                    <span>Hay @ViewData["testigosExitPoll"] centros cargados en el sistema </span>
+                }
+            </td>
+            <td>
+                @if ((int)ViewData["testigosExitPoll"] == 0)
+                {
+                    <div class="mws-ic-16 ic-cross tableIcon16">
+                    </div>
+                                  
+                }
+                else
+                {
+                    <div class="mws-ic-16 ic-accept tableIcon16">
+                    </div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Inicialización de timelines
+            </td>
+            <td>
+                @{
+                    if (((int) ViewData["timelineParticipacion"] +
+                         (int) ViewData["timelineMovilizacion"] +
+                         (int) ViewData["timelineExitPoll"] +
+                         (int) ViewData["timelineQuickCount"] +
+                         (int) ViewData["timelineTotalizacion"]) > 0
+
+                        )
+                    {
+
+                        <span>Los timelines han sido inicializados</span>
+                    }
+                    else
+                    {
+                        <span>
+                            Timelines no inicializados. <a href="@Url.Action("InitializeTimelines")">Inicializar Ahora</a>
+                        </span>
+                    }
+                }
+            </td>
+            <td>
+                @{
+                    if (((int) ViewData["timelineParticipacion"] +
+                              (int) ViewData["timelineMovilizacion"] +
+                              (int) ViewData["timelineExitPoll"] +
+                              (int) ViewData["timelineQuickCount"] +
+                              (int) ViewData["timelineTotalizacion"]) == 0
+                         )
+                     {
+                         <div class="mws-ic-16 ic-cross tableIcon16">
+                         </div>
+
+                     }
+                     else
+                     {
+                         <div class="mws-ic-16 ic-accept tableIcon16">
+                         </div>
+                     }
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>

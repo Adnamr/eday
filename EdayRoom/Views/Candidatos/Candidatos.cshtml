@@ -1,0 +1,307 @@
+﻿@{
+    ViewBag.Title = "Candidatos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.ConfigurationMenuClass = "active";
+    ViewBag.SettingsCandidatoMenuClass = "active";
+
+}
+<script type="text/jqote" id="tpl-addCandidato">
+       <![CDATA[
+     <form id="form-add-candidato" class="data-loading-wrapper mws-form mws-panel"> 
+                <div class="mws-panel-header"><span class="mws-i-24 i-alert">Crear nueva candidato</span></div> 
+                <div class="data-loading-form"> 
+
+                    <label>Nombre:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="nombreCandidato" name="nombreCandidato" class="mws-textinput required" type="text"/> 
+                    </div>
+                    <label>Color Candidato:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="color" type="text" class="mws-textinput mws-colorpicker" />
+                    </div>
+                    <label>Coalición:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="coalicion" name="coalicion" class="mws-textinput required"  maxlength="64" type="text"/> 
+                    </div>
+                    <label>Color coalicion:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="colorcoalicion" type="text" class="mws-textinput mws-colorpicker" />
+                    </div>
+                    <label>Partido:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="partido" name="partido" class="mws-textinput required" maxlength="64"  type="text"/> 
+                    </div>
+                    <label>Color Partido:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="colorpartido" type="text" class="mws-textinput mws-colorpicker" />
+                    </div>
+                    <div class="data-loading-buttons" style="clear:both"> 
+                        <input type="button" id="add-data-action" value="Agregar Datos" class="mws-button green small"/> 
+                        <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+                </div>
+            </form>
+       ]]>
+</script>
+<script type="text/jqote" id="tpl-editCandidato">
+       <![CDATA[
+     <form id="form-edit-candidato" class="data-loading-wrapper mws-form mws-panel"> 
+                <div class="mws-panel-header"><span class="mws-i-24 i-alert">Editar candidato</span></div> 
+                <div class="data-loading-form"> 
+
+                 <label>Nombre:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="nombreCandidato" name="nombreCandidato" class="mws-textinput required" type="text" value="<*= this.nombre *>"/> 
+                    </div>
+                                        <label>Color candidato:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="color" type="text" class="mws-textinput mws-colorpicker" style="background-color:#<*= this.color *>" value="<*= this.color *>"/>
+                    </div>
+
+                    <label>Coalición:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="coalicion" name="coalicion" class="mws-textinput required"  maxlength="64" type="text" value="<*= this.coalicion *>"/> 
+                    </div>
+                    <label>Color Coalicion:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="colorcoalicion" type="text" class="mws-textinput mws-colorpicker" style="background-color:#<*= this.colorcoalicion *>" value="<*= this.colorcoalicion *>"/>
+                    </div>
+                    <label>Partido:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="partido" name="partido" class="mws-textinput required" maxlength="64"  type="text"  value="<*= this.partido *>"/> 
+                    </div>      
+                                        <label>Color Partido:</label> 
+                    <div class="data-loading-field mws-form-item "> 
+                        <input id="colorpartido" type="text" class="mws-textinput mws-colorpicker" style="background-color:#<*= this.colorpartido *>" value="<*= this.colorpartido *>"/>
+                    </div>
+
+                                  <div class="data-loading-buttons" style="clear:both"> 
+                        <input type="button" id="add-data-action" value="Modificar Candidato" class="mws-button green small"/> 
+                        <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+                </div>
+            </form>
+       ]]>
+</script>
+<script type="text/javascript">
+    var oTable;
+    $(document).ready(function () {
+        oTable = $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "/Candidatos/GetAllCandidatos"
+        });
+
+        $(".deleteCandidato").live("click", function () {
+            if (confirm("Esta seguro de que desea borrar este candidato?")) {
+                $.ajax({
+                    url: "/Candidatos/DeleteCandidato/" + $(this).attr("candidato-id"),
+                    success: function () {
+                        oTable.fnDraw();
+                    }
+                });
+            }
+        });
+
+        $(".editCandidato").live("click", function () {
+            var id = $(this).attr("candidato-id");
+            $.getJSON("/Candidatos/GetCandidato/" + id,
+                function (data) {
+                    var panelHtml = $("#tpl-editCandidato").jqote(data);
+                    $('body').block({
+                        message: panelHtml,
+                        css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                        focusInput: true,
+                        overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                    });
+                    $('#color').ColorPicker(
+                            {
+                                onChange: function (hsb, hex, rgb) {
+                                    $('#color').css('backgroundColor', '#' + hex);
+                                    $('#color').val(hex);
+                                }
+                            });
+                    $('#colorpartido').ColorPicker(
+                            {
+                                onChange: function (hsb, hex, rgb) {
+                                    $('#colorpartido').css('backgroundColor', '#' + hex);
+                                    $('#colorpartido').val(hex);
+                                }
+                            });
+                    $('#colorcoalicion').ColorPicker(
+                            {
+                                onChange: function (hsb, hex, rgb) {
+                                    $('#colorcoalicion').css('backgroundColor', '#' + hex);
+                                    $('#colorcoalicion').val(hex);
+                                }
+                            });
+
+                    //BINDING de los action buttons
+                    $('#add-data-action').click(function () {
+                        var candidato = {
+                            nombre: $("#nombreCandidato").val(),
+                            coalicion: $("#coalicion").val(),
+                            partido: $("#partido").val(),
+                            color: $("#color").val(),
+                            colorpartido: $("#colorpartido").val(),
+                            colorcoalicion: $("#colorcoalicion").val(),
+
+                            relid: id
+                        };
+                        $.ajax({
+                            url: '/Candidatos/EditCandidato',
+                            data: candidato,
+                            type: "POST",
+                            success: function () {
+                                oTable.fnDraw();
+                                $('body').unblock();
+                                alert("Candidato Editado");
+                            }
+                        });
+
+                    });
+                    $('#add-data-cancel').click(function () {
+                        $('body').unblock();
+
+                    });
+                }
+            );
+
+        });
+
+        $("#btn-addCandidato").click(function () {
+            var panelHtml = $("#tpl-addCandidato").jqote();
+            $('body').block({
+                message: panelHtml,
+                css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                focusInput: true,
+                overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+            });
+            $('#color').ColorPicker(
+                { onChange: function (hsb, hex, rgb) {
+                    $('#color').css('backgroundColor', '#' + hex);
+                    $('#color').val(hex);
+                }
+                });
+            $('#colorpartido').ColorPicker(
+                            {
+                                onChange: function (hsb, hex, rgb) {
+                                    $('#colorpartido').css('backgroundColor', '#' + hex);
+                                    $('#colorpartido').val(hex);
+                                }
+                            });
+            $('#colorcoalicion').ColorPicker(
+                            {
+                                onChange: function (hsb, hex, rgb) {
+                                    $('#colorcoalicion').css('backgroundColor', '#' + hex);
+                                    $('#colorcoalicion').val(hex);
+                                }
+                            });
+            $.get("/Candidatos/GetCandidatos", function (data) {
+                var candidatos = $.map(data.candidato, function (n, i) {
+                    return n.nombre;
+                });
+                $("#nombreCandidato").autocomplete({
+                    source: candidatos,
+                    minLength: 0
+                });
+
+                var coalicion = $.map(data.coaliciones, function (n, i) {
+                    return n.nombre;
+                });
+                $("#coalicion").autocomplete({
+                    source: coalicion,
+                    minLength: 0
+                });
+
+                var partidos = $.map(data.partidos, function (n, i) {
+                    return n.nombre;
+                });
+                $("#partido").autocomplete({
+                    source: partidos,
+                    minLength: 0
+                });
+
+            });
+
+            $("#form-add-candidato").validate({
+                invalidHandler: function () {
+                    if ($.fn.effect) {
+                        $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                    }
+                },
+                rules: {
+
+                },
+                messages: {
+                    nombreCandidato: {
+                        required: "* Obligatorio"
+                    },
+                    tiempoRegresivo: {
+                        digits: "* Solo numeros ",
+                        min: $.format("El valor debe ser mayor que {0}"),
+                        max: $.format("El valor debe ser menor que {0}"),
+                        required: "* Obligatorio"
+                    },
+                    maxRepeats: {
+                        digits: "* Solo numeros ",
+                        min: $.format("El valor debe ser mayor que {0}"),
+                        required: "* Obligatorio"
+                    }
+                }
+            });
+            //BINDING de los action buttons
+            $('#add-data-action').click(function () {
+                if ($("#form-add-candidato").valid()) {
+                    var candidato = {
+                        nombre: $("#nombreCandidato").val(),
+                        coalicion: $("#coalicion").val(),
+                        partido: $("#partido").val(),
+                        color: $("#color").val(),
+                        colorpartido: $("#colorpartido").val(),
+                        colorcoalicion: $("#colorcoalicion").val()
+                    };
+
+                    $.ajax({
+                        url: '/Candidatos/CrearCandidato',
+                        data: candidato,
+                        type: "POST",
+                        success: function () {
+                            oTable.fnDraw();
+                            $('body').unblock();
+                            alert("Candidato creada");
+                        }
+                    });
+
+                }
+
+            });
+            $('#add-data-cancel').click(function () {
+                $('body').unblock();
+            });
+        });
+    });
+</script>
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alert">Configuración de Candidatos</span>
+    </div>
+    <div class="mws-panel-body">
+        <table class="mws-datatable mws-table">
+            <thead>
+                <tr>
+                    <th>Nombre </th>
+                    <th>Coalición </th>
+                    <th>Partido </th>
+                    <th style="width: 30px !important;"></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <br />
+        <div style="text-align: right;">
+            <button class="green small ui-button " id="btn-addCandidato">Agregar Candidato</button>
+        </div>
+        <div id="container">
+        </div>
+    </div>
+</div>

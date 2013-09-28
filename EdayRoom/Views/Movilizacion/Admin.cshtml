@@ -1,0 +1,264 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.MovilizacionMenuClass = "active";
+
+}
+<script type="text/javascript">
+    function loadCentro(idCentro) {
+        $("#panel-mesas-content").load("@Url.Action("AdminCentro")?idCentro=" + idCentro, function() {
+            $("#panel-mesas-spinner").spin(false);
+            $("#panel-mesas-spinner").hide();
+            $("#panel-mesas-content").show("fade");
+        });
+    }
+
+    function loadMesa(idMesa) {
+        $("#panel-detalle-mesas-content").load("@Url.Action("AdminMesa")?idMesa=" + idMesa, function() {
+            $("#panel-detalle-mesas-spinner").spin(false);
+            $("#panel-detalle-mesas-spinner").hide();
+            $("#panel-detalle-mesas-content").show("fade");
+        });
+    }
+
+    $(document).ready(function() {
+        $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "@Url.Action("GetCentros")",
+            "sPaginationType": "full_numbers"
+        });
+        $(".centro-link").live("click",function() {
+            $("#panel-mesas-content").hide();
+            var centroId = $(this).attr("centro-id");
+            $("#panel-centros").hide("fade", function() {
+                $("#panel-mesas").show();
+                $("#panel-mesas-spinner").show();
+                $("#panel-mesas-spinner").spin("huge");
+                loadCentro(centroId);
+            });
+        });
+        var chartCentro;
+        // define the options
+        var options = {
+            chart: {
+                zoomType: 'x',
+                renderTo: 'mws-line-chart-general'
+            },
+            credits: {
+                href: null,
+                text: "Generado por EdayRoom"
+            },
+            title: {
+                text: 'Movilización'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickWidth: 0,
+                gridLineWidth: 1,
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: -3
+                }
+            },
+            yAxis: [{
+// left y axis
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }, {
+// right y axis
+                linkedTo: 0,
+                gridLineWidth: 0,
+                opposite: true,
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'right',
+                    x: -3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }],
+            tooltip: {
+                shared: true,
+                crosshairs: true
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                hs.htmlExpand(null, {
+                                    pageOrigin: {
+                                        x: this.pageX,
+                                        y: this.pageY
+                                    },
+                                    headingText: this.series.name,
+                                    maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ':<br/> ' +
+                                    this.y + ' visits',
+                                    width: 200
+                                });
+                            }
+                        }
+                    },
+                    marker: {
+                        lineWidth: 1
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Movilización'
+                }]
+        };
+
+        var optionsStates = {
+            chart: {
+                zoomType: 'x',
+                renderTo: 'mws-line-chart-states'
+            },
+            credits: {
+                href: null,
+                text: "Generado por EdayRoom"
+            },
+            title: {
+                text: 'Movilización x Estados'
+            },
+            xAxis: {
+                tickWidth: 0,
+                gridLineWidth: 1,
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: -3
+                }
+            },
+            yAxis: [{
+// left y axis
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'left',
+                    x: 3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }, {
+// right y axis
+                linkedTo: 0,
+                gridLineWidth: 0,
+                opposite: true,
+                title: {
+                    text: null
+                },
+                labels: {
+                    align: 'right',
+                    x: -3,
+                    y: 16,
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 0);
+                    }
+                },
+                showFirstLabel: false
+            }],
+            tooltip: {
+                shared: true,
+                crosshairs: true
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {}
+                        }
+                    },
+                    marker: {
+                        lineWidth: 1
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Movilización'
+                }]
+        };
+
+        $.getJSON('@Url.Action("GetChartData")', null, function(data) {
+            var movilizacionArray = new Array();
+            for (var i = 0; i < data.movilizacion.length; i++) {
+                movilizacionArray.push([Date.UTC(data.movilizacion[i].year, data.movilizacion[i].month, data.movilizacion[i].day, data.movilizacion[i].hour, data.movilizacion[i].min), data.movilizacion[i].value]);
+            }
+            options.series[0].data = movilizacionArray;
+            chartCentro = new Highcharts.Chart(options);
+        });
+    });
+
+</script>
+<div id="panel-centros">
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+                <div id="mws-line-chart-general" style="height: 250px; width: 100%;">
+                </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="mws-panel grid_8">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-table-1">Centros de votacion</span>
+        </div>
+        <div class="mws-panel-body">
+            <table class="mws-datatable mws-table">
+                <thead>
+                    <tr>
+                        <th>Centro</th>
+                        <th>Estado</th>
+                        <th>Municipio</th>
+                        <th>Parroquia</th>
+                        <th>Votantes</th>
+                        <th>Movilización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="panel-mesas" class="grid_8" style="display: none;">
+    <div id="panel-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-mesas-content">
+    </div>
+</div>
+<div id="panel-detalle-mesas" class="grid_8" style="display: none;">
+    <div id="panel-detalle-mesas-spinner" style="height: 20px; margin: auto; margin-top: 100px; width: 20px;">
+    </div>
+    <div id="panel-detalle-mesas-content">
+    </div>
+</div>

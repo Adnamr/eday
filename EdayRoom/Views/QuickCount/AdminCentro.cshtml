@@ -1,0 +1,261 @@
+﻿@using System.Web.Script.Serialization
+@using EdayRoom.Models
+@{
+    ViewBag.Title = "AdminCentro";
+    Layout = null;
+    var centro = (Centro) ViewData["centro"];
+    var quickCountDone = (bool) ViewData["quickCountDone"];
+    Mesa mesa = quickCountDone ? (Mesa) ViewData["mesa"] : null;
+    List<Totalizacion> totales = quickCountDone ? (List<Totalizacion>) ViewData["totales"] : null;
+    int votosTotales = totales != null ? totales.Sum(t => t.valor) : 0;
+}
+<h2>AdminCentro</h2>
+<style type="text/css">
+    .editInput { width: 50px; }
+</style>
+
+<script type="text/html" id="tpl-add-data-candidato-row" >
+    <![CDATA[
+        <label> <*= this.nombre *>  [<*= this.partido *>] </label> 
+        <div class="data-loading-field mws-form-item">
+            <input type="number" class="digits mws-textinput required numeric" name="candidato-<*=this.id*>" 
+                   id="candidato-<*=this.id*>" value="<*=this.Valor*>"/>
+        </div> 
+        ]]>
+</script>
+<script type="text/html" id="tpl-add-data-quickcount" >
+    <![CDATA[
+        <form id="form-valor-quickcount" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Carga de datos</span></div> 
+            <div class="data-loading-form"> 
+                <label>Centro de Votacion:</label> <div class="data-loading-field"><*= this.Centro *></div> 
+                <label>Mesa:</label> 
+                <div class="data-loading-field mws-form-item"><select id="ddMesa">
+                                                                  <option value="">-Seleccione una mesa-</option></select></div> 
+                <label>Contacto:</label> <div class="data-loading-field" id="contactName"></div> 
+                <label>Numero Telefonico:</label> <div class="data-loading-field" id="contactPhone"></div> 
+                
+                <div style="clear: both; font-size: 16px; font-weight: bold; margin-top: 10px;">Candidatos</div>
+                <div id="candidatoPanel" style="clear: both; max-height: 200px; overflow: auto;">
+                    
+                </div>
+                 
+
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Agregar Datos" class="mws-button green small"/> 
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+            </div>
+        </form>
+        ]]>
+</script>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/edayroom/wr.quickcount.js")"> </script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#back-to-centros").click(function() {
+            oTable.fnDraw();
+            $("#panel-mesas").hide("fade", function() {
+                $("#panel-mesas-content").html('');
+                $("#panel-centros").show("fade");
+
+            });
+        });
+        $(".editParticipacion").click(function() {
+            var id = $(this).attr('totalizacion-id');
+            $("#conteo-" + id + ",#conteoInput-" + id).toggle();
+            $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+        });
+        $(".acceptEdit").click(function() {
+            var id = $(this).attr('totalizacion-id');
+            $("#conteo-" + id + ", #conteoInput-" + id).toggle();
+            $("#lnkEdit-" + id + ", #btnEdit-" + id).toggle();
+            quickcount.updateSingleQuickCount(id, $("#conteoInput-" + id).val(),
+                function() {
+                    loadCentro(@centro.id);
+                }
+            );
+
+        });
+        $(".add-data").click(function() {
+            var item = $(this).parents(".timelineItem");
+            var contact = @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["contact"]));
+            var panelHtml = $("#tpl-add-data-quickcount").jqote(contact);
+
+            $('div#mws-container').block({
+                message: panelHtml,
+                css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                focusInput: true,
+                overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+            });
+            //ACTIVO LAS RESTRICCIONES AL CAMPO
+            $("#form-valor-quickcount").validate({
+                invalidHandler: function() {
+                    if ($.fn.effect) {
+                        $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                    }
+                }
+            });
+            $("#candidatoPanel").spin("small");
+            $.getJSON("/QuickCount/GetCandidatos", function(data) {
+                $("#candidatoPanel").spin(false);
+                $("#candidatoPanel").append($("#tpl-add-data-candidato-row").jqote(data));
+                $(data).each(function() {
+                    $("#candidato-" + this.id).rules("add", {
+                        min: this.value
+                    });
+                });
+            });
+            $.getJSON("/QuickCount/GetMesas?centroId=" + contact.CentroId, function(data) {
+
+                $("#ddMesa").data("testigos", data);
+                $(data).each(function() {
+                    $("#ddMesa").append($("<option>").attr("value", this.IdMesa).html(this.Numero));
+                });
+                $("#ddMesa").change(function() {
+                    var testigos = $("#ddMesa").data("testigos");
+                    var found = false;
+                    for (var i = 0; i < testigos.length; i++) {
+                        if (testigos[i].IdMesa == $("#ddMesa").val()) {
+                            $("#contactName").html(testigos[i].Nombre);
+                            $("#contactPhone").html(testigos[i].Telefono);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        $("#contactName").html('');
+                        $("#contactPhone").html('');
+                    }
+                });
+                $("#ddMesa").rules("add", {
+                    required: true
+                });
+            });
+            //BINDING de los action buttons
+            $('#add-data-action').click(function() {
+                if ($("#form-valor-quickcount").valid()) {
+                    $('div#mws-container').unblock();
+
+                    contact.MesaId = $("#ddMesa").val();
+
+                    quickcount.updateQuickCount(item, contact, $("#form-valor-quickcount").serializeArray(), function () {
+
+                        loadCentro(@centro.id);
+                    });
+
+                    $.jGrowl($.format("QuickCount reportada para centro \"{0}\".", contact.Centro), {
+                        header: "QuickCount",
+                        animateOpen: {
+                            opacity: 'show'
+                        },
+                        animateClose: {
+                            opacity: 'hide'
+                        }
+                    });
+                }
+            });
+            $('#add-data-cancel').click(function() {
+                $('div#mws-container').unblock();
+            });
+        });
+
+    });
+
+</script>
+<div>
+    <div class="mws-panel grid_8 mws-collapsible">
+        <div class="mws-panel-header">
+            <span class="mws-i-24 i-bar-graph">Quick Count "@centro.Nombre"</span>
+        </div>
+        <div class="mws-panel-body">
+            @if (quickCountDone)
+            {
+                <div class="mws-form-message">
+                    <table>
+                        <tr>
+                            <td style="padding-right: 10px; text-align: right;">
+                                <b>Mesa Totalizada:</b>
+                            </td>
+                            <td>
+                                #@mesa.numero
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 10px; text-align: right;">
+                                <b>Total votantes en mesa:</b>
+                            </td>
+                            <td>
+                                @mesa.votantes
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 10px; text-align: right;">
+                                <b>Votos emitidos:</b>
+                            </td>
+                            <td>
+                                @(mesa.Totalizacions.Sum(t => t.valor))
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 10px; text-align: right;">
+                                <b>Participación:</b>
+                            </td>
+                            <td>
+                                @(mesa.Totalizacions.Sum(t => t.valor)*100/mesa.votantes)%
+                            </td>
+                        </tr>
+                    </table>
+                    <h3>Totalizacion</h3>
+                    <table class="mws-datatable mws-table">
+                        <thead>
+                            <th>Candidato</th>
+                            <th>Partido</th>
+                            <th>Votos</th>
+                            <th>Procentaje</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            @foreach (Totalizacion t in totales)
+                            {
+                                <tr>
+                                    <td>@t.RelacionCandidatoPartidoCoalicion.Candidato.nombre
+                                    </td>
+                                    <td>@t.RelacionCandidatoPartidoCoalicion.Partido.nombre
+                                    </td>
+                                    <td>
+                                        <span id="conteo-@t.ID" value="@t.valor">
+                                            @t.valor
+                                        </span>
+                                        <input id="conteoInput-@t.ID" value="@t.valor" class="editInput" style="display: none;"/>
+                                    </td>
+                                    <td>@(t.valor*100/votosTotales)%
+                                    </td>
+                                    <td>
+                                        <div id="lnkEdit-@t.ID" totalizacion-id="@t.ID"  class="mws-ic-16 ic-edit editParticipacion  tableIcon16 clickable" 
+                                             style="float: left;">
+                                        </div>
+                                        <button id="btnEdit-@t.ID" class="acceptEdit" style="display: none" totalizacion-id="@t.ID">
+                                            OK</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="mws-form-message error">
+                    Este centro aun no ha sido totalizado.
+                </div>
+            }
+        </div>
+    </div>
+    <br />
+    @if (!quickCountDone)
+    {
+        <input type="button"  value="Totalizar Ahora" style="width: 96px;"
+               class="mws-button green small add-data" />
+    }
+    <input type="button" id="back-to-centros" value="Regresar" style="width: 96px;" class="mws-button red small" />
+</div>

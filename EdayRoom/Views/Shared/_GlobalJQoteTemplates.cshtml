@@ -1,0 +1,16 @@
+﻿@* TEMPLATE DE LLAMADAS ACTIVAS *@
+<script type="text/html" id="tpl-alert-item-notification">
+    <![CDATA[
+        <li class="read">
+            <a href="/Alertas/DetailAlerta?idAlerta=<*= this.id *>&modulo=<*= this.modulo *>">
+                <span class="message"><b> <*= this.modulo *> </b></span>
+                <span class="message"> <*= this.centro *> </span>
+                <* if(this.mesa >0) {*>
+                    <span class="message"> Mesa #<*= this.mesa *> </span>
+                <*}*>
+                <span class="message"> <*= this.name *> </span>
+                <span class="time"><*= this.fechaStr *> </span>
+             </a>
+            </li>
+        ]]>
+</script>

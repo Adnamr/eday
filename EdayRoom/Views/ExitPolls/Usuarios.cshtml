@@ -1,0 +1,94 @@
+﻿@using EdayRoom.Models
+@{
+    ViewBag.Title = "Participación";
+    ViewBag.ExitPollsMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.participacion.js";
+    ViewBag.JqoteTemplate = "_ExitPollsJqoteTemplates";
+    var users = (List<user>)ViewData["users"];
+}
+@section headContent
+{
+    <style type="text/css">
+        .cargaNormal {
+            
+        }
+        .cargaAlta {
+                background-color: #E1F1C0;
+                border-color: #B5D56D;
+                color: #62A426;            
+        }
+        .cargaBaja {
+                background-color: #FFCBCA;
+                border-color: #EB979B;
+                color: #9B4449;            
+        }
+        
+    </style>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $(".pauseControl").live("click", function () {
+                var userid = $(this).attr('uid');
+                $.ajax({
+                    url: "@Url.Action("TogglePauseUser")",
+                    data: { userId: userid },
+                    success: function(data) {
+                       location.reload();
+                    },
+                    error: function() {
+                        alert('Ocurrio un error. Contacte a un administrador');
+                    }
+                });
+                
+
+
+            });
+        });
+    </script>
+
+}
+<h2>Usuarios</h2>
+@foreach (var u in users)
+{
+    var minDate = u.ExitPolls1.Any() ? u.ExitPolls1.Min(p => p.fecha) : DateTime.MinValue;
+    var maxDate = DateTime.Now;//u.Participacions.Any() ? u.Participacions.Max(p => p.fecha) : DateTime.MinValue;
+    var span = maxDate - minDate;
+    var total = span.TotalHours == 0 ? 1 : span.TotalHours;
+    var centros = u.AsignacionExitPolls.Count();
+    var candidatos = ((int)ViewData["candidatosCount"]);
+    var cargasTotal = u.ExitPolls1.Count() / (candidatos == 0? 1:candidatos);
+    var cargasPorHora = Math.Round(u.ExitPolls1.Count() / total, 2);
+    var alertasCount = u.ExitPollAlertas.Count();
+    var ratio = cargasPorHora / centros;
+    string clase = "cargaNormal";
+    if(ratio >= 1)
+    {
+        clase = "cargaAlta";
+    }else if(ratio < 0.8)
+    {
+        clase = "cargaBaja";
+    }
+    
+    <div class="timelineItem @clase" id="contacto-@(u.id)" style="width:200px; float:left; margin-right:15px;">
+        <div class="userInfo">
+            <b style="font-size: 15px;">@(u.nombre + " " + u.apellido)
+            </b>
+            <br>
+            <b>Centros Asignados</b>: @centros <br />
+            <b>Cargas Totales</b>: @cargasTotal <br />
+            <b>Cargas por hora</b>: @cargasPorHora <br />
+            <b>Alertas</b>:@alertasCount<br />
+            @if (!u.paused)
+            {
+                <input type="button" value="Pausar" uid="@u.id" class="pauseControl mws-button add-data red small" />
+            }
+            else
+            {
+                <input type="button" value="Reiniciar" uid="@u.id" class="pauseControl mws-button add-data green small" />
+            }
+        </div>
+    </div>
+    
+    
+    
+    
+}

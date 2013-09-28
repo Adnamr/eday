@@ -1,0 +1,301 @@
+﻿@{
+    ViewBag.Title = "Movilizacion";
+    ViewBag.MovilizacionMenuClass = "active";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.movilizacion.js";
+    ViewBag.JqoteTemplate = "_MovilizacionJqoteTemplates";
+}
+@section headContent
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            movilizacion.init();
+            //MENU DE CONTROL DE PARTICIPACION
+            $(".add-data").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = movilizacion.createContactObject(item);
+                console.log(contact);
+                var panelHtml = $("#tpl-add-data-movilizacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#agregarAlerta").click(function () {
+                    if ($(this).attr('checked')) {
+                        $("#valor-alert,#message-alert").show();
+                    } else {
+                        $("#valor-alert,#message-alert").hide();
+                    }
+                });
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#form-valor-movilizacion").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    },
+                    rules: {
+                        valormovilizacion: {
+                            min: contact.LastValue,
+                            max: contact.Votantes
+                        },
+                        valorcola: {
+                            min: 0,
+                            max: contact.Votantes
+                        }
+                    },
+                    messages: {
+                        valormovilizacion: {
+                            digits: "* Solo numeros ",
+                            min: $.format("El valor debe ser mayor que {0}"),
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        },
+                        valorcola: {
+                            digits: "* Solo numeros ",
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        }
+                    }
+                });
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-movilizacion").valid()) {
+                        $('div#mws-container').unblock();
+
+
+                        movilizacion.updateMovilizacion(item, contact, $("#valormovilizacion").val(),
+                            function () {
+                                if ($("#agregarAlerta").attr("checked") && $("#valor-alert").val() != '') {
+                                    movilizacion.alertaPartipacion(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                                }
+                            }
+                        );
+                        $.jGrowl($.format("Movilizacion reportada para centro \"{0}\".", contact.Centro), {
+                            header: "Movilizacion",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //MENU DE CONTROL DE ALERTAS
+            $(".add-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = movilizacion.createContactObject(item);
+                var panelHtml = $("#tpl-add-alert-movilizacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+
+                $("#alert-select-pane").spin("small");
+                $.getJSON("/Alertas/GetAlertas", function (data) {
+                    $("#alert-select-pane").spin(false);
+                    $("#valor-alert").append($("#tpl-alerta-item").jqote(data));
+                });
+
+                $("#form-valor-alerta").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#valor-alert").rules("add", {
+                    messages: {
+                        required: "Seleccione el tipo de alerta"
+                    }
+                });
+                //BINDING de los action buttons
+                $('#add-data-action').click(function () {
+                    if ($("#form-valor-alerta").valid()) {
+                        $('div#mws-container').unblock();
+                        //add alert
+                        movilizacion.alertaPartipacion(item, contact, $("#valor-alert").val(), $("#message-alert").val());
+                        //$("#timeline-alertas").append($("#tpl-timeline-alertas").jqote(contact));
+
+                        $.jGrowl($.format("Alerta reportada en centro \"{0}\".", contact.Centro), {
+                            header: "Alertas "
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //UPDATE ALERT DIALOG
+            $(".update-alert").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = movilizacion.createContactObject(item);
+                console.log(contact);
+                var panelHtml = $("#tpl-update-alert-movilizacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#mensajes-alerta").append($("#tpl-alert-messages").jqote(contact.BlockingAlert.Messages));
+
+                $("#form-update-alert").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    }
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                $("#message-alert").rules("add", {
+                    messages: {
+                        required: "Debe agregar un comentario"
+                    }
+                });
+                //    //BINDING de los action buttons
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-alert").valid()) {
+                        $('div#mws-container').unblock();
+                        movilizacion.updateAlertaPartipacion(item, contact, $("#message-alert").val());
+                        $.jGrowl("Alerta Actualizada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#cancel-alert-action').click(function () {
+                    if (confirm("Esta seguro de que desea cancelar esta alerta?")) {
+                        $('div#mws-container').unblock();
+                        movilizacion.cancelAlertaMovilizacion(item, contact);
+                        $.jGrowl("Alerta Cancelada.", {
+                            header: "Alertas",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                }
+                );
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+            //Correccion de datos
+            $(".edit-last-value").live('click', function () {
+                var item = $(this).parents(".timelineItem");
+                var contact = movilizacion.createContactObject(item);
+                var panelHtml = $("#tpl-update-last-movilizacion").jqote(contact);
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#form-update-last-data").validate({
+                    invalidHandler: function () {
+                        if ($.fn.effect) {
+                            $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+                        }
+                    },
+                    rules: {
+                        lastvalue: {
+                            min: contact.PreviousValue,
+                            max: contact.Votantes
+                        },
+                        lastcola: {
+                            min: 0,
+                            max: contact.Votantes
+                        }
+                    },
+                    messages: {
+                        lastvalue: {
+                            digits: "* Solo numeros ",
+                            min: $.format("El valor debe ser mayor que {0}"),
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        },
+                        lastcola: {
+                            digits: "* Solo numeros ",
+                            max: $.format("El valor debe ser menor que {0}"),
+                            required: "* Obligatorio"
+                        }
+                    }
+                });
+
+
+                $('#add-data-action').click(function () {
+                    if ($("#form-update-last-data").valid()) {
+                        $('div#mws-container').unblock();
+
+                        movilizacion.updateLastMovilizacion(item, contact, $("#lastvalue").val(), $("#lastcola").val());
+
+                        $.jGrowl($.format("Movilizacion reportada para centro \"{0}\".", contact.Centro), {
+                            header: "Movilizacion",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function () {
+                    $('div#mws-container').unblock();
+                });
+            });
+        });
+    </script>
+}
+<div class="mws-report-container clearfix">
+    <a class="mws-report" href="#">
+        <!-- Statistic Icon (edit to change icon) -->
+        <span class="mws-report-icon mws-ic ic-building"></span>
+        <!-- Statistic Content -->
+        <span class="mws-report-content"><span class="mws-report-title">Centros de Votación</span>
+            <span id="stats-centros" class="mws-report-value">@ViewData["centrosVotacion"]</span>
+        </span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-chair">
+                                                  </span><span class="mws-report-content"><span class="mws-report-title">Mesas en elección</span>
+                                                             <span id="stats-mesas" class="mws-report-value">@ViewData["mesas"]</span> </span>
+                   </a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                                                                     </span><span class="mws-report-content"><span class="mws-report-title">Movilización</span>
+                                                                                <span id="stats-movilizacion" class="mws-report-value">@ViewData["movilizacion"]</span>
+                                                                            </span></a>
+</div>
+<div class="mws-panel grid_5">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-phone">Proximas llamadas
+            </span>
+    </div>
+    <div id="timeline-pendiente" class="timeline">
+    </div>
+</div>
+<div class="mws-panel grid_3">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-alarm-bell">Errores y alertas</span>
+    </div>
+    <div id="timeline-alertas" class="timeline">
+    </div>
+</div>

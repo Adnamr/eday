@@ -1,0 +1,264 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Map</title>
+    <link rel="stylesheet" href="/Content/bootstrap-responsive.min.css" />
+    <style>
+        .background {
+            fill: none;
+            pointer-events: all;
+        }
+
+        #states {
+            fill: #aaa;
+        }
+
+
+
+        .place-label {
+            font-size: 10px;
+        }
+
+        .state {
+            fill: #ddc;
+        }
+
+            .state.active {
+                fill: green;
+            }
+
+        .subunit-label {
+            fill: #000;
+            fill-opacity: 1.5;
+            font-size: 10px;
+            font-weight: 300;
+            text-anchor: middle;
+        }
+
+
+        .red {
+            fill: #f00;
+        }
+
+        .blue {
+            fill: #00f;
+        }
+
+        body {
+            background-color: #323232;
+        }
+
+        .pane {
+            border: 1px solid white;
+        }
+
+        #state-borders {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.5px;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            pointer-events: none;
+        }
+    </style>
+    <script src="/Scripts/jquery-1.7.1.min.js"></script>
+    <script src="/Scripts/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var width = 550,
+                height = 450;
+            var centered;
+            var currentState = 0;
+
+            var svg = d3.select("#map").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+
+
+            var projection = d3.geo.albers().parallels([0, 13])
+                .center([-75, 12])
+                .rotate([0, 0])
+                .scale(2000)
+                .translate([0, 0]);
+            var path = d3.geo.path().projection(projection);
+
+            svg.append("rect")
+                .attr("id", "zoomClear")
+                .attr("class", "background")
+                .attr("width", width)
+                .attr("height", height)
+                .on("click", clicked);
+            var g = svg.append('g');
+            var stateIdMap = {};
+            d3.json("/Scripts/mapas/ve2.json", function (error, ve) {
+
+                var subunits = topojson.feature(ve, ve.objects.subunits);
+
+                g.append("path")
+                    .datum(subunits)
+                    .attr("d", path);
+
+                g.selectAll(".subunits")
+                    .data(topojson.feature(ve, ve.objects.subunits).features)
+                    .enter().append("path")
+                    .attr("class", function (d) {
+
+                        var r = Math.random();
+                        var t = 'red';
+                        if (r > 0.5) {
+                            t = 'blue';
+                        }
+                        $(this).attr("id", "state" + currentState);
+                        var classes = "state state" + currentState + ' ' + t;
+                        stateIdMap[d.properties.name] = currentState;
+                        currentState += 1;
+                        return classes;
+                    }).attr("state", function (d) {
+                        console.log(d);
+                        var opt = $("<option>").html(d.properties.name).attr('value', stateIdMap[d.properties.name]);
+                        $("#stateSelector").append(opt);
+
+
+                        return d.properties.name;
+                    })
+
+                    .attr("d", path).on("click", clicked);
+
+                g.append("path")
+                  .datum(topojson.mesh(ve, ve.objects.subunits, function (a, b) { return a !== b; }))
+                  .attr("id", "state-borders")
+                  .attr("class", "state-borders")
+                  .attr("d", path);
+
+                var myOptions = $("#stateSelector option");
+                myOptions.sort(function (a, b) {
+                    if (a.text > b.text) return 1;
+                    else if (a.text < b.text) return -1;
+                    else return 0;
+                });
+                $("#stateSelector").empty().append(myOptions);
+
+            });
+
+            function clicked(d) {
+                var x, y, k;
+                if (d && centered !== d) {
+                    var centroid = path.centroid(d);
+                    x = centroid[0];
+                    y = centroid[1];
+                    k = 2;
+                    centered = d;
+                    var id = $('#stateSelector option').filter(function () { return $(this).html() == d.properties.name; }).val();
+                    $('#stateSelector').val(id);
+                    $("#selectedArea").html(d.properties.name);
+                } else {
+                    x = width / 2;
+                    y = height / 2;
+                    k = 1;
+                    centered = null;
+                    $("#stateSelector").val('');
+                    $("#selectedArea").html("General");
+
+                }
+
+                g.selectAll("path")
+                    .classed("active", centered && function (d) { return d === centered; });
+
+                g.transition()
+                    .duration(750)
+                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+                    .style("stroke-width", 1.5 / k + "px");
+
+
+
+            }
+
+            $("#stateSelector").change(function () {
+                var stateId = $(this).val();
+                if (stateId != '') {
+                    actuateLink(document.getElementById("state" + stateId));
+                } else {
+                    actuateLink(document.getElementById("zoomClear"));
+
+                }
+            });
+        });
+
+        function actuateLink(link) {
+            var allowDefaultAction = true;
+
+            if (link.click) {
+                link.click();
+                return;
+            } else if (document.createEvent) {
+                var e = document.createEvent('MouseEvents');
+                e.initEvent(
+                    'click'     // event type
+                    , true      // can bubble?
+                    , true      // cancelable?
+                );
+                allowDefaultAction = link.dispatchEvent(e);
+            }
+
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <div class="row-fluid">
+        <div class="span6">
+            <div id="map" class="span12 pane " style="margin-bottom: 10px;">
+                <div id="mapControl">
+                    <select id="stateSelector">
+                        <option value="">-- seleccione --</option>
+                    </select>
+
+                </div>
+                <div id="mapInner"></div>
+
+            </div>
+        </div>
+        <div class="span6">
+            <div class="row-fluid">
+            <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+            </div>
+                <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+                </div>
+                </div>
+            <div class="row-fluid">
+            <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+            </div>
+                <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+                </div>
+                </div>
+            <div class="row-fluid">
+            <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+            </div>
+                <div class="span6 pane " style="height: 150px; margin-bottom: 14px;">
+                </div>
+                </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span6 pane " style="height: 150px;">
+        </div>
+        <div class="span6 pane " style="height: 150px;">
+        </div>
+    </div>
+
+    <div>
+        <h1 id="selectedArea">General</h1>
+    </div>
+</body>
+</html>

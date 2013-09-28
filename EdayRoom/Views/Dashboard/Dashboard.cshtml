@@ -1,0 +1,745 @@
+﻿@{
+    ViewBag.Title = "DASHBOARD";
+    ViewBag.DashboardMenuClass = "active";
+    var estados = (List<string>)ViewData["estados"];
+    var municipios = (List<string>)ViewData["municipios"];
+    var parroquias = (List<string>)ViewData["parroquias"];
+
+}
+@section headContent
+{
+    <link rel="stylesheet" href="@Url.Content("~/Content/dashboard.css")"/>
+    <link rel="stylesheet" href="@Url.Content("~/Content/jui/jquery.multiselect.css")"/>
+    <style>
+        #tag1 li
+        {
+            margin: 0px;
+        }
+        #stats-mesas-participacion, #stats-centros-participacion, #stats-votantes-rep, #stats-alarmas-enlaces,
+         #stats-movilizacion-REP, #stats-votates-rep-mesas, #stats-votantes-rep-centros, .mws-report-value
+        {
+            font-size: 16px !important;
+        }
+
+        
+    </style>
+    <script src="@Url.Content("~/Scripts/jquery.multiselect.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/highcharts/themes/grid.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/edayroom/wr.dashboard.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/underscore.min.js")" type="text/javascript"></script>
+}
+
+<style>
+    .resultTable th {
+        font-weight: bold;
+        border-bottom: 1px solid grey;
+        
+    }
+    .resultTable td
+    {
+        padding: 5px;
+        
+    }
+    
+</style>
+
+<script type="text/html" id="tplCandidatoRow">
+    <![CDATA[
+        <tr>
+            <td>
+                <*= this.Nombre *>
+            </td>
+            <td>
+                <*= this.Votos *>
+            </td>
+            <td>
+                <*= this.PorcentajeVotos *>%
+            </td>
+            <td>
+                <*= this.Proyeccion *>
+            </td>
+            <td>
+                <*= this.PorcentajeProyeccion *>%
+            </td>
+        </tr>
+        ]]>
+</script>
+<script type="text/html" id="tplParticipacionRow">
+    <![CDATA[
+        <tr>
+            <td>
+                <*= this.strDate *>
+            </td>
+            <td>
+                <*= thousandSeparator(this.participacion,'.') *>
+            </td>
+            <td>
+                <*= this.pctParticipacion *>%
+            </td>
+            <td>
+                <*= thousandSeparator(this.movilizacion,'.') *>
+            </td>
+            <td>
+                <*= this.pctMovilizacion*>%
+            </td>
+            <td>
+                <*= this.relParticipacionMovilizacion.toFixed(2)*>%
+            </td>
+        </tr>
+        ]]>
+</script>
+<script type="text/html" id="tplAlertaRow">
+    <![CDATA[
+        <tr>
+            <td>
+                <*= this.name *>
+            </td>
+            <td>
+                <*= this.ocurrencias *>
+            </td>
+            <td>
+                <*= this.centrosAfectados.toFixed(2) *>%
+            </td>
+        </tr>
+        ]]>
+</script>
+
+
+<script type="text/html" id="tplHistoricoChart">
+    <![CDATA[
+        <div class="mws-panel grid_8 mws-collapsible">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-alert-2"><*= this.nombre *></span>
+            </div>
+            <div class="mws-panel grid_3">
+                <div class="mws-panel-body" >
+                    <div id="proyeccionGlobalHistorico-<*= this.id_muestra *>"></div>
+                    <div id="ganador-<*= this.id_muestra *>" class="mws-form-message"> a </div>
+
+                </div>
+                
+               
+            </div>
+            <div class="mws-panel grid_5">
+                <div class="mws-panel-body" id="proyeccionEstadoHistorico-<*= this.id_muestra *>" >
+                    <table  class="mws-table mws-datatable">
+                        <thead>
+                            <th>Estado </th>
+                            <th>Capriles </th>
+                            <th>Maduro </th>
+                            <th>Spread </th>
+
+                            <th>Abstencion </th>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            
+        </div>
+    ]]>
+</script>
+<script type="text/html" id="tplHistoricoChartRow">
+    <![CDATA[
+    <tr>
+         <td> <*= this.unidadGeografica1 *> </td>
+                            <td> <*= thousandSeparator(this.proyCapriles ,'.')*> </td>
+                            <td><*= thousandSeparator(this.proyChavismo,'.')*> </td>
+                            <td><*= thousandSeparator(this.proyCapriles - this.proyChavismo,'.') *>  </td>
+                            <td><*= thousandSeparator(this.abstencion ,'.')*> </td>
+
+    </tr>
+    ]]>
+</script>
+<script type="text/html" id="tplSustitucionRow">
+    <![CDATA[
+        <tr>
+            <td>
+                2012
+            </td>
+            <td>
+                <*= this.totalMud2012.toFixed(2) *>%
+            </td>
+            <td>
+                <*= this.totalPsuv2012.toFixed(2) *>%
+            </td>
+            <td>
+                <*= this.totalAbstencion2012.toFixed(2) *>%
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Actual
+            </td>
+            <td>
+                <*= this.totalMud.toFixed(2) *>%
+            </td>
+            <td>
+                <*= this.totalPsuv.toFixed(2) *>%
+            </td>
+            <td>
+                <*= this.totalAbstencion.toFixed(2) *>%
+            </td>
+        </tr>
+        ]]>
+</script>
+<script type="text/html" id="tplQuickCountRow">
+    <![CDATA[
+        <tr>
+            <td>
+                <*= this.Key *>
+            </td>
+            <td>
+                <*= this.Value.total *>
+            </td>
+            <td>
+                <*= this.Value.cerrados *>
+            </td>
+        </tr>
+        ]]>
+</script>
+<script type="text/html" id="tplAlertaTendencia">
+    <![CDATA[
+        <* if(this.oposicion != 0 || this.chavista != 0 || this.neutro!=0) {*>
+        <tr>
+            <td>
+                <*= this.name *>
+            </td>
+            <td>
+                <*= this.oposicionPct *>
+            </td>
+            <td>
+                <*= this.chavistaPct*>
+            </td>
+            <td>
+                <*= this.neutroPct*>
+            </td>
+            <td>
+                <*= this.total*>
+            </td>
+        </tr>
+        <*}*>
+        ]]>
+</script>
+<script type="text/html" id="tplTotalizacionTendencia">
+    <![CDATA[
+        <tr>
+            <td>
+                <*= this.tag1 *>
+            </td>
+            <td>
+                <*= this.totalizados *>
+            </td>
+            <td>
+                <*= this.pct*>%
+            </td>
+            <td>
+                <*= this.total*>
+            </td>
+        </tr>
+        ]]>
+</script>
+
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-bar-graph">Resultados</span>
+    </div>
+    <div class="mws-panel-body">
+        <div class="mws-panel-content">
+            <table>
+                <tr>
+                    <td>
+                        Tendencia
+                    </td>
+                    <td>
+                        Tama&ntilde;o
+                    </td>
+                    <td>
+                        Estado
+                    </td>
+                    <td>
+                        Municipio
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="tag1" multiple="multiple" style="width: 200px;">
+                            <option>Oposicion</option>
+                            <option>Chavista</option>
+                            <option>Neutral</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="tag2" multiple="multiple" style="width: 200px;">
+                            <option>Peque&ntilde;o</option>
+                            <option>Mediano</option>
+                            <option>Grande</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="estado" multiple="multiple" style="width: 200px;">
+                            @foreach (var e in estados)
+                            {
+                                <option>@e</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="municipio" multiple="multiple" style="width: 200px;">
+                            @foreach (var e in municipios)
+                            {
+                                <option>@e</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            
+            <div id="tabs">
+                <ul>
+                    <li><a href="#tab1" id="lnkTab1">Datos Rapidos</a></li>
+                    <li><a href="#tab2" id="lnkTab2">Participacion</a></li>
+                    <li><a href="#tab5" id="lnkTab5">Resultados Proyectados (Participacion)</a></li>
+                    <li><a href="#tab3" id="lnkTab3">Totalizacion</a></li>
+                    <li><a href="#tab4" id="lnkTab4">Alertas</a></li>
+                </ul>
+                <div id="tab1">
+                    @*DATOS DE ESTUDIO*@
+                    <div class="mws-report-container clearfix" style="margin-top: 15px;">
+                        <div style="font-weight: bold; margin-left: 10px;">
+                            Datos de Estudio</div>
+                        <a class="mws-report" href="#" title="Centros en Conteo"><span class="mws-report-icon mws-ic ic-house">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Centros en Conteo</span>
+                            <span id="stats-centros" class="mws-report-value"></span></span></a><a class="mws-report"
+                                href="#" title="Mesas en Conteo"><span class="mws-report-icon mws-ic ic-box-down">
+                                </span><span class="mws-report-content"><span class="mws-report-title">Mesas en Conteo</span>
+                                    <span id="stats-mesas" class="mws-report-value"></span></span></a><a class="mws-report"
+                                        href="#" title="Votantes REP en Conteo"><span class="mws-report-icon mws-ic ic-walk">
+                                        </span><span class="mws-report-content"><span class="mws-report-title">Votantes REP
+                                            en Conteo</span> <span id="stats-votantes-rep" class="mws-report-value"></span>
+                                        </span></a>
+                        <!--a class="mws-report" href="#" title="Enlaces en Conteo"><span class="mws-report-icon mws-ic ic-link">
+                                                                                    </span><span class="mws-report-content"><span class="mws-report-title">Enlaces en Conteo</span>
+                                                                                               <span id="stats-enlaces" class="mws-report-value"></span></span>
+                        </a-->
+                    </div>
+                    @*METRICAS GENERALES*@
+                    <div class="mws-report-container clearfix">
+                        <div style="font-weight: bold; margin-left: 10px;">
+                            Métricas generales (compara con Participación)
+                        </div>
+                        <a class="mws-report" href="#" title="Centros contabilizados"><span class="mws-report-icon mws-ic ic-house">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Centros contabilizados</span>
+                            <span id="stats-centros-participacion" class="mws-report-value"></span></span>
+                        </a><a class="mws-report" href="#" title="Mesas contabilizadas"><span class="mws-report-icon mws-ic ic-box-down">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Mesas contalibilizadas</span>
+                            <span id="stats-mesas-participacion" class="mws-report-value"></span></span>
+                        </a><a class="mws-report" href="#" title="Votantes REP (mesas)"><span class="mws-report-icon mws-ic ic-walk">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Votantes REP
+                            (mesas)</span> <span id="stats-votates-rep-mesas" class="mws-report-value "></span>
+                        </span></a><a class="mws-report" href="#" title="Votantes REP (centros)"><span class="mws-report-icon mws-ic ic-walk">
+                        </span><span class="mws-report-content" style="width: 300px;"><span class="mws-report-title">
+                            Votantes REP (centros)</span> <span id="stats-votantes-rep-centros" class="mws-report-value ">
+                            </span></span></a>
+                        <!--a class="mws-report" href="#" title="Cargas Promedio por contacto por hora">
+                                                                                                                                                                                                                                                                                                  <span class="mws-report-icon mws-ic ic-walk"></span><span class="mws-report-content">
+                                                                                                                                                                                                                                                                                                                                                          <span class="mws-report-title">Cargas Promedio por contacto por hora </span><span
+                                                                                                                                                                                                                                                                                                                                                                                                                                          id="stats-participacion-cargas-por-hora" class="mws-report-value "></span>
+                                                                                                                                                                                                                                                                                                                                                      </span></a-->
+                    </div>
+                    @*ALARMAS*@
+                    <div class="mws-report-container clearfix">
+                        <div style="font-weight: bold; margin-left: 10px;">
+                            Resumen Alarmas
+                        </div>
+                        <a class="mws-report" href="#" title="Total Acumulado"><span class="mws-report-icon mws-ic ic-small-car">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Total Acumulado</span>
+                            <span id="stats-alarmas-total" class="mws-report-value "></span></span></a><a class="mws-report"
+                                href="#" title="Alertas generadas en la ultima hora"><span class="mws-report-icon mws-ic ic-small-car">
+                                </span><span class="mws-report-content"><span class="mws-report-title">Cant. Ult Hora</span>
+                                    <span id="stats-alarmas-ultima-hora" class="mws-report-value "></span></span>
+                            </a><a class="mws-report" href="#" title="Enlaces con alarmas generadas"><span class="mws-report-icon mws-ic ic-small-car">
+                            </span><span class="mws-report-content"><span class="mws-report-title">Enlaces con Alarmas
+                                Generadas</span> <span id="stats-alarmas-enlaces" class="mws-report-value "></span>
+                            </span></a>
+                        <!--a class="mws-report" href="#" title="Älarmas promedio por enlace"><span
+                                                                                                  class="mws-report-icon mws-ic ic-small-car"></span><span class="mws-report-content">
+                                                                                                                                                         <span class="mws-report-title">Alarmas promedio por enlace</span> <span id="stats-alarmas-enlace-promedio"
+                                                                                                                                                                                                                                 class="mws-report-value "></span></span></a-->
+                        <a class="mws-report" href="#" title="Alarmas promedio por centro contabilizado"><span
+                            class="mws-report-icon mws-ic ic-small-car"></span><span class="mws-report-content">
+                                <span class="mws-report-title">Alarmas promedio por centro contabilizado</span>
+                                <span id="stats-alarmas-centro-promedio" class="mws-report-value "></span></span>
+                        </a>
+                    </div>
+                    @*RESULTADOS PARTICIPACION*@
+                    <div class="mws-report-container clearfix">
+                        <div style="font-weight: bold; margin-left: 10px;">
+                            Resultados Participación
+                        </div>
+                        <a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-walk"></span><span
+                            class="mws-report-content"><span class="mws-report-title">Votantes Contabilizacion
+                            </span><span id="stats-participacion-votantes" class="mws-report-value "></span>
+                        </span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                        </span><span class="mws-report-content"><span class="mws-report-title">(mesas) %Participacion</span>
+                            <span id="stats-participacion-mesas-part-vs-rep" class="mws-report-value "></span>
+                        </span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Proyección de
+                            Mesa a Centro</span> <span id="stats-participacion-proyeccion" class="mws-report-value ">
+                            </span></span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                            </span><span class="mws-report-content"><span class="mws-report-title">(centro) %Participacion
+                                Actual</span> <span id="stats-participacion-centros-part-vs-rep" class="mws-report-value ">
+                                </span></span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                                </span><span class="mws-report-content"><span class="mws-report-title">Participación
+                                    Proyectada 6pm </span><span id="stats-participacion-proyeccion-total" class="mws-report-value ">
+                                    </span></span></a>
+                    </div>
+                    @*RESULTADOS MOVILIZACION*@
+                    <div class="mws-report-container clearfix">
+                        <div style="font-weight: bold; margin-left: 10px;">
+                            Resultados Movilización
+                        </div>
+                        <a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car"></span>
+                            <span class="mws-report-content"><span class="mws-report-title">Centros Contabilizados</span>
+                                <span id="stats-movilizacion-centros" class="mws-report-value "></span></span>
+                        </a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                        </span><span class="mws-report-content"><span class="mws-report-title">Votantes REP
+                            Contabilizados</span> <span id="stats-movilizacion-REP" class="mws-report-value ">
+                            </span></span></a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                            </span><span class="mws-report-content"><span class="mws-report-title">Votantes Movilizados</span>
+                                <span id="stats-movilizacion-votantes" class="mws-report-value "></span></span>
+                        </a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-small-car">
+                        </span><span class="mws-report-content"><span class="mws-report-title">%Movilizacion
+                            vs REP</span> <span id="stats-movilizacion-pct" class="mws-report-value "></span>
+                        </span></a>
+                    </div>
+                    <div class="grid_4">
+                        <div class="mws-report-container">
+                            <div style="font-weight: bold; margin-left: 10px;">
+                                Resultados Conteo R&aacute;pido
+                            </div>
+                            <a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-control-fastforward">
+                            </span><span class="mws-report-content"><span class="mws-report-title">Centros Cerrados</span>
+                                <span id="stats-quickcount-centros" class="mws-report-value "></span></span>
+                            </a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-calculator-black">
+                            </span><span class="mws-report-content"><span class="mws-report-title">%Cargado</span>
+                                <span id="stats-quickcount-pct" class="mws-report-value "></span></span></a>
+                        </div>
+                    </div>
+                    <div class="grid_4">
+                        <div class="mws-report-container">
+                            <div style="font-weight: bold; margin-left: 10px;">
+                                Resultados Totalizaci&oacute;n
+                            </div>
+                            <a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-control-fastforward">
+                            </span><span class="mws-report-content"><span class="mws-report-title">Mesas Cerradas</span>
+                                <span id="stats-totalizacion-mesas" class="mws-report-value "></span></span>
+                            </a><a class="mws-report" href="#"><span class="mws-report-icon mws-ic ic-calculator-black">
+                            </span><span class="mws-report-content"><span class="mws-report-title">%Cargado</span>
+                                <span id="stats-totalizacion-pct" class="mws-report-value "></span></span></a>
+                        </div>
+                    </div>
+                    <div style="clear: both;">
+                        &nbsp;</div>
+                </div>
+                <div id="tab2">
+                    <div class="mws-panel grid_8">
+                        <div class="mws-panel-header">
+                            <span class="mws-i-24 i-bar-graph">Participacion</span>
+                        </div>
+                        <div class="mws-panel-body">
+                            <div class="mws-panel-content" style="overflow: auto;">
+                                <div class="grid_8" id="mws-line-chart-general">
+                                </div>
+                                <div id="participacionChart" class="grid_8" >
+                                </div>
+                                <div id="participacionData" class="grid_8" style="height: 400px; overflow: auto;">
+                                    <table class="mws-table" id="participacionTable">
+                                        <thead>
+                                            <th>Hora</th>
+                                            <th>Participacion # </th>
+                                            <th>%</th>
+                                            <th>Movilizacion #</th>
+                                            <th>%</th>
+                                            <th>% Mov. vs Part.</th>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid_full">
+                        <br />
+                    </div>
+                    <div class="mws-panel grid_8">
+                        <div class="mws-panel-header">
+                            <span class="mws-i-24 i-alert-2">Matriz de Participaci&oacute;n Segmentada</span>
+                        </div>
+                        <div class="mws-panel-body">
+                            <div class="mws-panel-content" style="overflow: auto;">
+                                <table class="mws-table">
+                                    <thead>
+                                        <th></th>
+                                        <th>Oposicion</th>
+                                        <th>Neutro</th>
+                                        <th>Chavista</th>
+                                    </thead>
+                                    <tr>
+                                        <th>Grande</th>
+                                        <td>
+                                            <span id="OposicionGrande"></span>
+                                            <br />
+                                            102.530 / 21.60%
+                                        </td>
+                                        <td>
+                                            <span id="NeutroGrande"></span>
+                                            <br />
+                                            24.130 / 5,08%
+                                        </td>
+                                        <td>
+                                            <span id="ChavistaGrande"></span>
+                                            <br />
+                                            169.881 / 35.79%
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mediano</th>
+                                        <td>
+                                            <span id="OposicionMediano"></span>
+                                            <br />
+                                            75.299 / 15,86%
+                                        </td>
+                                        <td>
+                                            <span id="NeutroMediano"></span>
+                                            <br />
+                                            7.654 / 1,61%
+                                        </td>
+                                        <td>
+                                            <span id="ChavistaMediano"></span>
+                                            <br />
+                                            64.626 / 13,61%
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pequeno </th>
+                                        <td>
+                                            <span id="OposicionPequeño"></span>
+                                            <br />
+                                            6.940 / 1.46%
+                                        </td>
+                                        <td>
+                                            <span id="NeutroPequeño"></span>
+                                            <br />
+                                            2.646 / 0.56%
+                                        </td>
+                                        <td>
+                                            <span id="ChavistaPequeño"></span>
+                                            <br />
+                                            20.965 / 4.42%
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total </th>
+                                        <td>
+                                            <span id="OposicionTotal"></span>
+                                            <br />
+                                            184.769 / 38,93 %
+                                        </td>
+                                        <td>
+                                            <span id="NeutroTotal"></span>
+                                            <br />
+                                            34.430 / 7.25%
+                                        </td>
+                                        <td>
+                                            <span id="ChavistaTotal"></span>
+                                            <br />
+                                            255.472 / 53.82 %
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;">
+                        &nbsp;</div>
+                </div> 
+                <div id="tab3">
+                    <div id="generalPanels" style="clear: both;">
+                        <div class="mws-panel grid_8">
+                            <div class="mws-panel-header">
+                                <span class="mws-i-24 i-bar-graph">Conteo R&aacute;pido</span>
+                            </div>
+                            <div class="mws-panel-body">
+                                <div class="mws-panel-content" style="overflow: auto;">
+                                    <div id="quickcountChart" class="grid_8">
+                                    </div>
+                                    <br/>
+                                    <div class="grid_8">
+                                        <table id="quickcountTable" class="mws-table">
+                                            <thead>
+                                                <th>Muestra</th>
+                                                <th>Centros Total</th>
+                                                <th>Centros Totalizados</th>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mws-panel grid_8">
+                            <div class="mws-panel-header">
+                                <span class="mws-i-24 i-bar-graph">Proyección por Sustitución</span>
+                            </div>
+                            <div class="mws-panel-body">
+                                <div class="mws-panel-content" style="overflow: auto;">
+                                    <div class="grid_8">
+                                        <table id="susticionTable" class="mws-table">
+                                            <thead>
+                                                <th>Elección</th>
+                                                <th>Oposición</th>
+                                                <th>Chavismo</th>
+                                                <th>Abstención</th>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mws-panel grid_8">
+                            <div class="mws-panel-header">
+                                <span class="mws-i-24 i-bar-graph">Totalizacion</span>
+                            </div>
+                            <div class="mws-panel-body">
+                                <div class="mws-panel-content" style="overflow: auto;">
+                                    <div id="totalizacionChart" class="grid_8">
+                                    </div>
+                                    <br />
+                                    <div class="grid_8">
+                                        <table id="totalizacionTable" class="mws-table">
+                                            <thead>
+                                                <th>Candidato</th>
+                                                <th>Votos Totalizados</th>
+                                                <th>%</th>
+                                                <th>Votos Proyectados</th>
+                                                <th>%</th>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        <table id="totalizacionTendenciaTable" class="mws-table">  
+                                            <thead>
+                                                <th>Tendencia</th>
+                                                <th>centros totalizados</th>
+                                                <th>% </th>
+                                                <th># de centros </th>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="clear:both;">&nbsp;</div>
+                    </div>
+                </div>
+                <div id="tab4">
+                    <div class="mws-panel grid_8">
+                        <div class="mws-panel-header">
+                            <span class="mws-i-24 i-alert-2">Alertas</span>
+                        </div>
+                        <div class="mws-panel-body">
+                            <div class="mws-panel-content" style="overflow: auto;">
+                                <div class="grid_8">
+                                    <div id="alertasPorEstadoChart">
+                                    </div>
+                                    
+                                    <table id="alertasTendenciaTable" class="mws-table">
+                                        <thead>
+                                            <th>Alerta</th>
+                                            <th>%oposicion</th>
+                                            <th>%chavismo</th>
+                                            <th>%neutro </th>
+                                            <th>total</th>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                
+
+                                <div class="grid_8">
+                                    <div id="alertasActivasChart">
+                                    </div>
+                                    <table id="alertasActivasTable" class="mws-table">
+                                        <thead>
+                                            <th>nombre</th>
+                                            <th>#</th>
+                                            <th>%</th>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                                                <div class="grid_8">
+                                    <div id="alertasAcumuladasChart">
+                                    </div>
+                                    <table id="alertasAcumuladasTable" class="mws-table">
+                                        <thead>
+                                            <th>nombre</th>
+                                            <th>#</th>
+                                            <th>%</th>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;">
+                        &nbsp;</div>
+                </div>
+                <div id="tab5">
+                    <div class="mws-panel grid_8">
+                        <div class="mws-panel-header">
+                            <span class="mws-i-24 i-bar-graph">Resultados Por Muestra</span>
+                        </div>
+                        <div class="mws-panel-body">
+                            <div class="mws-panel-content" style="overflow: auto;">
+                                <div class="grid_8">
+                                    <div id="proyeccionParticipacion">
+                                        Test
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear: both;">
+                        &nbsp;</div>
+                </div>
+            </div>
+            <br />
+            <h3>Descargas</h3>
+            La generaci&oacute;n de estos archivos puede tardar varios minutos<br />
+            <a href="/Excel/Centros">Centros y Mesas</a><br />
+            <a href="/Excel/ParticipacionMovilizacion">Participaci&oacute;n y Movilizaci&oacute;n</a><br />
+            <a href="/Excel/Totalizacion">Totalizaci&oacute;n</a><br />
+            <a href="/Excel/ProyeccionPorSustitucion">Proyecci&oacute;n por Sustituci&oacute;n</a><br />
+        </div>
+    </div>
+    <div class="separator">
+    </div>
+</div>

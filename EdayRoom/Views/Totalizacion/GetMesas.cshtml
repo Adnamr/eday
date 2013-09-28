@@ -1,0 +1,159 @@
+﻿@using EdayRoom.Models
+@{
+    Layout = null;
+    var centro = (Centro) ViewData["centro"];
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AdminCentro</title>
+        <script type="text/javascript">
+
+            var mesas =
+                @Html.Raw(JsonConvert.SerializeObject(ViewData["mesasDict"], new KeyValuePairConverter()))
+
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            function loadMesa(idMesa) {
+                $("#panel-detalle-mesas-content").load("@Url.Action("AdminMesa")?idMesa=" + idMesa, function() {
+                    $("#panel-detalle-mesas-spinner").spin(false);
+                    $("#panel-detalle-mesas-spinner").hide();
+                    $("#panel-detalle-mesas-content").show("fade");
+                });
+            }
+
+            $("#tabla-mesas").dataTable({
+                bProcessing: true
+            });
+
+            $("#mesas-volver").click(function() {
+                $("#panel-mesas").hide("fade", function() {
+                    $("#panel-mesas-content").html('');
+                    $("#panel-centros").show("fade");
+                });
+
+            });
+
+            $(".mesa-link").click(function() {
+                var mesaId = $(this).attr("mesa-id");
+                var panelHtml = $("#tpl-add-data-totalizacion").jqote(mesas[mesaId]);
+
+                $('div#mws-container').block({
+                    message: panelHtml,
+                    css: { border: '0px', width: '400px', backgroundColor: 'none' },
+                    focusInput: true,
+                    overlayCSS: { backgroundColor: '#000', opacity: 0.9 }
+                });
+                $("#candidatoPanel").spin("small");
+
+                $.getJSON("/Totalizacion/GetCandidatos?mesaId=" + mesaId, function(data) {
+                    $("#candidatoPanel").spin(false);
+                    $("#candidatoPanel").append($("#tpl-add-data-candidato-row").jqote(data));
+                    $(data).each(function() {
+                        $("#candidato-" + this.CandidatoId).rules("add", {
+                            min: this.Valor
+                        });
+                    });
+                });
+                //ACTIVO LAS RESTRICCIONES AL CAMPO
+                console.log($("#form-valor-totalizacion"));
+//            $("#form-valor-totalizacion").validate({
+//                invalidHandler: function() {
+//                    if ($.fn.effect) {
+//                        $(".blockElement").effect("shake", { distance: 6, times: 2 }, 35);
+//                    }
+//                }
+//            });
+//            //BINDING de los action buttons
+                $('#add-data-action').click(function() {
+                    if ($("#form-valor-totalizacion").valid()) {
+                        $('div#mws-container').unblock();
+
+
+                        //exitpolls.updateExitPoll(item, contact, $("#form-valor-exitpolls").serializeArray());
+
+                        $.ajax({
+                            contentType: 'application/json, charset=utf-8',
+                            type: "POST",
+                            url: "/Totalizacion/UpdateValues",
+                            data: JSON.stringify({ idMesa: mesaId, valores: $("#form-valor-totalizacion").serializeArray() }),
+                            cache: false,
+                            dataType: "json",
+                            success: function(contact) {
+                                alert("Valores cargados");
+                            },
+                            error: function(x, ts, et) {
+                                alert('error ' + x + "-" + ts + "-" + et);
+                            }
+                        });
+
+                        $.jGrowl("Totalizacion reportada ", {
+                            header: "ExitPoll",
+                            animateOpen: {
+                                opacity: 'show'
+                            },
+                            animateClose: {
+                                opacity: 'hide'
+                            }
+                        });
+                    }
+                });
+                $('#add-data-cancel').click(function() {
+                    $('div#mws-container').unblock();
+                });
+            });
+
+        </script>
+        <div>
+            <a href="#centros" id="mesas-volver">volver</a>
+        </div>
+        <br />
+        <div class="mws-panel grid_8">
+            <div class="mws-panel-header">
+                <span class="mws-i-24 i-table-1">Mesas del centro "@centro.Nombre" </span>
+            </div>
+            <div class="mws-panel-body">
+                <table id="tabla-mesas" class="mws-datatable mws-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Contacto</th>
+                            <th>Telf</th>
+                            <th>Contactado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Mesa m in (List<Mesa>) ViewData["mesas"])
+                        {
+                            <tr class="gradeX">
+                                <td>
+                                    <a href="#mesa=@m.id" mesa-id="@m.id" class="mesa-link">Mesa @m.numero </a>
+                                </td>
+                                <td>
+                                    @m.Testigoes.FirstOrDefault().nombre
+                                </td>
+                                <td>
+                                    @m.Testigoes.FirstOrDefault().numero
+                                </td>
+                                <td class="center">
+                                    @if (m.Totalizacions.Any())
+                                    {
+                                        <div id="status-@m.id" class="mws-ic-16 ic-accept tableIcon16">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="status-@m.id" class="mws-ic-16 ic-cross tableIcon16">
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

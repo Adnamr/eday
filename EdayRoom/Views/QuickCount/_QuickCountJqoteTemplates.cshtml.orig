@@ -1,0 +1,188 @@
+﻿@* TEMPLATE DE LLAMADAS ACTIVAS *@
+<script type="text/html" id="tpl-timeline-pendientes">
+    <![CDATA[
+        <div
+            class="timelineItem" id="contacto-<*=this.CentroId*>">
+            <* if(this.ParticipacionIdParent != null) {*>
+            <div class="edit-panel"><a class="edit-last-value">corregir último</a></div>
+            <*}*>
+            <div class="userInfo">
+                <b style="font-size: 15px;"><*=this.Centro *> </b><br />
+                <input type="button" value="Agregar Datos" class="mws-button add-data green small">
+                <input type="button" value="Alerta" class="mws-button add-alert red small">
+            </div>
+        </div>
+        ]]>
+</script>
+@* TEMPLATE DE PROXIMAS LLAMADAS *@
+<script type="text/html" id="tpl-timeline-proximas">
+    <![CDATA[
+        <div class="timelineItem timelineProxima" id="contacto-<*=this.CentroId*>">
+            <* if(this.ParticipacionIdParent != null) {*>
+            <div class="edit-panel"><a class="edit-last-value">corregir último</a></div>
+            <*}*>
+            <div class="userInfo">
+                <div class="timer-holder"> 
+                    <span class="timer" seconds-to-call="<*= this.SecondsToCall *>"> </span>
+                </div>
+                <b style="font-size: 15px;"><*=this.Centro *> </b><br />
+                <b>Testigo</b>: <*=this.NombreTestigo*> <b>Telefono </b>: <*=this.Numero*><br />
+                <b>Proxima llamada</b>: <*= this.NextUpdateStr *><br />
+                <input type="button" value="Actualizar ahora" class="mws-button add-data green small">
+                <input type="button" value="Alerta" class="mws-button add-alert red small">
+            </div>
+        </div>
+        ]]>
+</script>
+@* TEMPLATE DE ALERTAS*@
+<script type="text/html" id="tpl-timeline-alertas">
+    <![CDATA[
+        <div class="timelineItem alert <* if(this.IsAlertBlocked) {*>blocked<*}*>" id="alerta-<*=this.CentroId*>">
+            <div class="userInfo">
+                <b><*= this.Centro *> </b> <br/>
+                <b>Fecha:</b>
+                <*= this.BlockingAlert.FechaStr *>
+                <br/>
+                <b>Tipo:</b>                   
+                <*= this.BlockingAlert.Name *>
+                <br/>
+                <input type="button" value="Actualizar Alerta" class="mws-button update-alert green small">
+            </div>    
+        </div>
+        ]]>
+</script>
+@* DIALOGO DE AGREGAR DATA *@
+<script type="text/html" id="tpl-add-data-candidato-row" >
+    <![CDATA[
+        <label> <*= this.nombre *>  [<*= this.partido *>] </label> 
+        <div class="data-loading-field mws-form-item">
+            <input type="number" class="digits mws-textinput required numeric" name="candidato-<*=this.id*>" 
+                   id="candidato-<*=this.id*>" value="<*=this.Valor*>"/>
+        </div> 
+        ]]>
+</script>
+
+<script type="text/html" id="tpl-add-data-quickcount" >
+    <![CDATA[
+        <form id="form-valor-quickcount" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Carga de datos</span></div> 
+            <div class="data-loading-form"> 
+                <label>Centro de Votacion:</label> <div class="data-loading-field"><*= this.Centro *></div> 
+                <label>Mesa:</label> 
+                <div class="data-loading-field mws-form-item"><select id="ddMesa">
+                                                                  <option value="">-Seleccione una mesa-</option></select></div> 
+                <label>Contacto:</label> <div class="data-loading-field" id="contactName"></div> 
+                <label>Numero Telefonico:</label> <div class="data-loading-field" id="contactPhone"></div> 
+                
+                <div style="clear: both; font-size: 16px; font-weight: bold; margin-top: 10px;">Candidatos</div>
+                <div id="candidatoPanel" style="clear: both; max-height: 200px; overflow: auto;">
+                    
+                </div>
+                 
+
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Agregar Datos" class="mws-button green small"/> 
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/></div>
+            </div>
+        </form>
+        ]]>
+</script>
+@* DIALOGO DE AGREGAR ALERTA*@
+<script type="text/html" id="tpl-add-alert-quickcount">
+    <![CDATA[
+        <form id="form-valor-alerta" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Alerta!!</span></div> 
+            <div class="data-loading-form"> 
+                <label>Centro de Votacion:</label> <div class="data-loading-field"><*=this.Centro*></div> 
+                <label>Contacto:</label> <div class="data-loading-field"><*=this.NombreTestigo*> </div> 
+                <label>Numero Telefonico:</label> <div class="data-loading-field"><*=this.Numero*></div> 
+                <label>Alerta:</label> 
+                <div id="alert-select-pane" class="data-loading-field mws-form-item" > 
+                
+                    <select id="valor-alert" class="required"> 
+                        <option value=""> - Seleccione -</option> 
+                    </select> 
+                </div>
+                <label>Informacion Extra:</label> 
+                <div class="data-loading-field mws-form-row  "> 
+                    <textarea id="message-alert"  cols="40" ></textarea> 
+                </div>
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Reportar" class="mws-button green small"/> 
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/>
+                </div>
+            </div>
+        </form>
+        ]]>
+</script>
+@* Item  de alerta*@
+<script type="text/html" id="tpl-alerta-item">
+    <![CDATA[
+        <option value="<*= this.id *>" block="<*= this.blocking *>" regresivo="<*= this.regresivo *>">  <*= this.name *> </option> 
+        ]]>
+</script>
+
+@* DIALOGO DE update de last data*@
+<script type="text/html" id="tpl-update-last-quickcount">
+    <![CDATA[
+        <form id="form-update-last-data" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Corregir datos</span></div> 
+            <div class="data-loading-form"> 
+                <label>Centro de Votacion:</label> <div class="data-loading-field"><*=this.Centro*> </div> 
+                <label>Contacto:</label> <div class="data-loading-field"><*=this.NombreTestigo*></div> 
+                <label>Numero Telefonico:</label> <div class="data-loading-field"><*=this.Numero*></div> 
+                <label>Fecha Actualizacion:</label> <div class="data-loading-field"><*=this.LastUpdateStr*></div> 
+
+                <label>Participacion:</label> <div class="data-loading-field mws-form-item">
+                                                  <input type="number" name="lastvalue" id="lastvalue" class="mws-textinput required digits" value="<*=this.LastValue*>"/>
+                                              </div> 
+                <label>Cola:</label> <div class="data-loading-field mws-form-item">
+                                         <input type="number" name="lastcola" id="lastcola" class="mws-textinput required digits" value="<*=this.LastCola*>"/>
+                                     </div> 
+
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Actualizar Alerta" class="mws-button green small"/> 
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/>
+                </div>
+            </div> 
+        </form>
+        ]]>
+</script>
+@* DIALOGO DE SNOOZE*@
+<script type="text/html" id="tpl-update-alert-quickcount">
+    <![CDATA[
+        <form id="form-update-alert" class="data-loading-wrapper mws-form mws-panel"> 
+            <div class="mws-panel-header"><span class="mws-i-24 i-list">Actualizar Alerta</span></div> 
+            <div class="data-loading-form"> 
+                <label>Centro de Votacion:</label> <div class="data-loading-field"><*=this.Centro*> </div> 
+                <label>Contacto:</label> <div class="data-loading-field"><*=this.NombreTestigo*></div> 
+                <label>Numero Telefonico:</label> <div class="data-loading-field"><*=this.Numero*></div> 
+                <label>Fecha Alerta:</label> <div class="data-loading-field"><*=this.BlockingAlert.FechaStr*></div> 
+                <label>Tipo Alerta:</label> <div class="data-loading-field"><*=this.BlockingAlert.Name*></div> 
+                <label>Mensaje Alerta:</label> <div class="data-loading-field ">
+                                                   <ul id="mensajes-alerta" class="alertaMessages">
+                                                   </ul>
+                                               </div> 
+                <label>Mensaje:</label> 
+                <div class="data-loading-field mws-form-item "> 
+                    <textarea id="message-alert"  class="required" style="height: 5em;" rows="100%" cols="100%" ></textarea> 
+                </div>
+                <div class="data-loading-buttons"> 
+                    <input type="button" id="add-data-action" value="Actualizar Alerta" class="mws-button green small"/> 
+                    <* if(this.BlockingAlert.CanCancel){*>
+                    <input type="button" id="cancel-alert-action" value="Cancelar Alerta" class="mws-button blue small"/> 
+                    <* } *>
+                    <input type="button" id="add-data-cancel" value="Cancelar" class="mws-button red small"/>
+                </div>
+            </div> 
+        </form>
+        ]]>
+</script>
+@* Listado de alertas *@
+<script type="text/html" id="tpl-alert-messages">
+    <![CDATA[
+        <li>
+            <*= this *>
+        </li>
+        ]]>
+</script>

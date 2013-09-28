@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "SetupWizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.CustomScript = "~/Scripts/edayroom/wr.centros.js";
+    ViewBag.CentrosStepClass = "current";
+    ViewBag.ConfigurationMenuClass = "active";
+    ViewBag.SettingsCentroMenuClass = "active";
+}
+<script type="text/javascript">
+    var oTable;
+    $(document).ready(function() {
+        $(".mws-progressbar").progressbar({ value: 0 });
+        $(".mws-tabs").tabs();
+
+        oTable = $(".mws-datatable").dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": "/Centros/GetAllCentrosPaginate"
+        });
+
+
+        $("#cancelLoad").click(function() {
+            $.ajax(
+                {
+                    url: '/Centros/CancelLoad'
+                });
+        });
+        setup.init({
+            url: '/Centros/LoadCentros',
+            uploadCallback: function() {
+                setup.getCentros();
+            }
+        });
+
+        setup.getCentros();
+    });
+</script>
+<h1> Configuración de centros de votación</h1>
+
+<div class="mws-panel grid_8">
+    <div class="mws-tabs">
+        <ul>
+            <li><a href="#tab-1"> Carga </a></li>
+            <li><a href="#tab-2"> Listado </a></li>
+        </ul>
+        <div id="tab-1">
+            <div id="uploader">
+                <div id="filelist">
+                    No runtime found.</div>
+                <a id="pickfiles" href="#">
+                    <input type="button" value="Elegir Archivo" class="mws-button green small"></a>
+                <a id="uploadfiles" href="#">
+                    <input type="button" value="Subir" class="mws-button blue small"></a>
+            </div>
+            <div id="progress" style="display: none;">
+                <a href="#" id="cancelLoad">Cancelar Carga</a>
+                <div id style="padding: 15px 15px 5px 15px;">
+                    <div class="mws-progressbar">
+                    </div>
+                </div>
+                <div id="progressText" style="padding: 0px 15px 5px 15px;">
+                </div>
+            </div>
+        </div>
+        <div id="tab-2">
+            <div class="mws-panel-body">
+                <table id="centros-table" class="mws-datatable mws-table">
+                    <thead>
+                        <th>Cod</th>
+                        <th>Centro</th>
+                        <th>Ubicacion</th>
+                        <!--th>Mesa</th>
+                        <th>Votantes</th>
+                        <th>Contacto</th>
+                        <th>Contacto Secundario</th-->
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

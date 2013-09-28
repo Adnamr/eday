@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+@{
+    var db = new EdayRoom.Models.edayRoomEntities();
+    var user = db.users.Single(u => u.username == User.Identity.Name);
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- Apple iOS and Android stuff (do not remove) -->
+    <meta name="apple-mobile-web-app-capable" content="no" />   
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
+    <!-- Required Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/reset.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/text.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/fonts/ptsans/stylesheet.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/fluid.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/mws.style.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/16x16.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/24x24.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/32x32.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/demo.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/edayroom.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jui/jquery.ui.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/core/form.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.jgrowl.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.tzineClock.css")" media="screen" />
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/plugins/plupload/jquery.plupload.queue.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/mws.theme.css")" media="screen" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/colorpicker.css")" />
+    <link href="../../Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+    <!-- JavaScript Plugins -->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.dateFormat.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/mws.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/blockUI.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/validate/jquery.validate-min.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.jgrowl.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.jeditable.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jqote.min.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/global.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.tzineClock/jquery.tzineClock.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/spin.min.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/datatables/jquery.dataTables-min.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.toggle.js")" > </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/plupload/plupload.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/plupload/plupload.flash.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/plupload/plupload.html4.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/plupload/plupload.html5.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/plupload/jquery.plupload.queue/jquery.plupload.queue.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/validationMessages.js")"> </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highcharts/highcharts.js")" > </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highcharts/highcharts-more.js")" > </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/colorpicker/colorpicker-min.js")" > </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/edayroom/wr.global.js")" > </script>
+    @if (!string.IsNullOrEmpty(ViewBag.CustomScript))
+    {
+        <script type="text/javascript" src="@Url.Content(ViewBag.CustomScript)"> </script>
+    }
+    @Html.Partial("_GlobalJQoteTemplates")
+    @if (!string.IsNullOrEmpty(ViewBag.JqoteTemplate))
+    {
+        @Html.Partial((string)ViewBag.JqoteTemplate)
+    }
+    @RenderSection("headContent", required: false)
+    <title>E-Day Room - @ViewBag.Title </title>
+</head>
+<body>
+    <!-- Header -->
+    <div id="mws-header" class="clearfix">
+        <!-- Logo Container -->
+        <div id="mws-logo-container">
+            <div id="mws-logo-wrap">
+                <img src="@Url.Content("~/images/mws-logo.png")" alt="mws admin" />
+            </div>
+        </div>
+        <div id="mws-user-tools" class="clearfix">
+            <div id="mws-user-info" class="mws-inset">
+                <div id="mws-user-functions">
+                    <div id="mws-username">
+                        Hola, @user.nombre @user.apellido
+                    </div>
+                    <ul>
+                        <li><a href="@Url.Action("LogOff", "Account")">Salir</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Start Main Wrapper -->
+    <div id="mws-wrapper">
+        <!-- Necessary markup, do not remove -->
+        <div id="mws-sidebar-stitch">
+        </div>
+        <div id="mws-sidebar-bg">
+        </div>
+        <!-- Sidebar Wrapper -->
+        <div id="mws-sidebar">
+            <!-- Main Navigation -->
+            <div id="mws-navigation">
+                 @Html.Partial("NavigationMenu")
+            </div>
+        </div>
+        <!-- Main Container Start -->
+        <div id="mws-container" class="clearfix">
+            <!-- Inner Container Start -->
+            <div class="container">
+                @RenderBody()
+            </div>
+            <!-- Inner Container End -->
+            <!-- Footer -->
+            <div id="mws-footer">
+                Copyright E-Day Room 2012. All Rights Reserved.
+            </div>
+        </div>
+        <!-- Main Container End -->
+    </div>
+</body>
+</html>

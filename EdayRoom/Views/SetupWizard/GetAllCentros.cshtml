@@ -1,0 +1,28 @@
+﻿@{
+    Layout = null;
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".mws-datatable").dataTable({
+                "bServerSide": true,
+                "bProcessing": true,
+                "sAjaxSource": "/SetupWizard/GetAllCentrosPaginate"
+            }
+        );
+    });
+</script>
+<table class="mws-datatable mws-table">
+    <thead>
+        <tr>
+            <th>Centro    </th>
+            <th>Ubicacion </th>
+            <th>Mesa      </th>
+            <th>Votantes  </th>
+            <th>Contacto  </th>
+            <th>Contacto  Secundario </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>

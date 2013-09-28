@@ -1,0 +1,33 @@
+﻿@using EdayRoom.API
+@{
+    Layout = null;
+    var Users = (List<EdayRoomUser>) ViewData["users"];
+    var Errores = (List<string>) ViewData["errores"];
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".mws-datatable").dataTable();
+    });
+</script>
+<table class="mws-datatable mws-table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Password</th>
+            <th>Usuario</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (EdayRoomUser u in Users)
+        {
+            <tr>
+                <td>@u.Name
+                </td>
+                <td>@u.Password
+                </td>
+                <td>@u.Username
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

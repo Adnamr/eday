@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!-- Apple iOS and Android stuff (do not remove) -->
+        <meta name="apple-mobile-web-app-capable" content="no" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1" />
+        <!-- Required Stylesheets -->
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/reset.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/text.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/fonts/ptsans/stylesheet.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/fluid.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/mws.style.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/16x16.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/24x24.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/icons/32x32.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/demo.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/mws.theme.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/EdayRoom.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jui/jquery.ui.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/core/form.css")" media="screen" />
+        <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.jgrowl.css")" media="screen" />
+
+        <!-- JavaScript Plugins -->
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/blockUI.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/plugins/validate/jquery.validate-min.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.jgrowl.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/highstock.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/jqote.min.js")"> </script>
+        <script type="text/javascript" src="@Url.Content("~/Scripts/global.js")"> </script>
+        @if (!string.IsNullOrEmpty(ViewBag.CustomScript))
+        {
+            <script type="text/javascript" src="@Url.Content(ViewBag.CustomScript)"> </script>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.JqoteTemplate))
+        {
+            @Html.Partial((string) ViewBag.JqoteTemplate)
+            ;
+        }
+    
+
+ 
+        <title>MWS Admin - Dashboard</title>
+    </head>
+    <body>
+        <!-- Header -->
+        <div id="mws-header" class="clearfix">
+            <!-- Logo Container -->
+            <div id="mws-logo-container">
+                <!-- Logo Wrapper, images put within this wrapper will always be vertically centered -->
+                <div id="mws-logo-wrap">
+                    <img src="@Url.Content("~/images/mws-logo.png")" alt="mws admin" />
+                </div>
+            </div>
+        </div>
+        @RenderBody()
+        
+        <!-- Footer -->
+        <div id="mws-footer">
+            Copyright E-Day Room 2012. All Rights Reserved.
+        </div>
+        <!-- Main Container End -->
+    
+    </body>
+</html>
